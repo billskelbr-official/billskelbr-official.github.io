@@ -89,21 +89,29 @@ body {
 }
 
 .container {
-	width: 24vw;
+	width: 32vw;
 	margin: 1px auto;
 	border: 1px solid #333;
 	border-radius: 10px;
 	background: #eee;
 }
 
+table {
+	width: 30vw;
+}
+
 a {
+	color: inherit;
+}
+
+td {
 	display: inline-block;
 	border:1px solid #333;
 	border-radius: 5px;
 	text-align: center;
 	width: 6vw;
 	height: 5vw;
-	line-height: 5vw;
+	line-height: 2.5vw;
 	margin: 2%;
 	font-size: 2vw;
 	text-decoration: none;
@@ -114,6 +122,11 @@ a {
 		box-shadow: inset 0 0 2px rgba(0,0,0,1);
 	}
 }
+
+.texts {
+	font-size: 1vw;
+}
+
 .call {
 	background: green;
 	color: #fff;
@@ -168,18 +181,20 @@ margin-left: -50px;
 <h2> <br /> </h2>
 <div class = "container">
   <input/>
-  <div class = "row pootis"> <a class="nig"> 1 </a> <a class="nig"> 2 </a> <a class="nig"> 3 </a> </div>
-  <div class = "row pootis"> <a class="nig"> 4 </a> <a class="nig"> 5 </a> <a class="nig"> 6 </a> </div>
-  <div class = "row pootis"> <a class="nig"> 7 </a> <a class="nig"> 8 </a> <a class="nig"> 9 </a> </div>
-  <div class = "row pootis"> <a class="clear">Clear</a> <a class="nig"> 0 </a><a class = "enter">Enter</a></div>
+<table>
+  <tr class = "row pootis"> <td><a class="nig"> 1 </a></td>                                         <td><a class="nig"> 2 </a><br /><span class="texts">A B C</span></td> <td><a class="nig"> 3 </a><br /><span class="texts">D E F</span></td> </tr>
+  <tr class = "row pootis"> <td><a class="nig"> 4 </a><br /><span class="texts">G H I</span></td>   <td><a class="nig"> 5 </a><br /><span class="texts">J K L</span></td> <td><a class="nig"> 6 </a><br /><span class="texts">M N O</span></td> </tr>
+  <tr class = "row pootis"> <td><a class="nig"> 7 </a><br /><span class="texts">P Q R S</span></td> <td><a class="nig"> 8 </a><br /><span class="texts">T U V</span></td> <td><a class="nig"> 9 </a><br /><span class="texts">W X Y Z</span></td> </tr>
+  <tr class = "row pootis"> <td><a class="clear">Clear</a></td>                                     <td><a class="nig"> 0 </a></td>                                       <td><a class = "enter">Enter</a></td></tr>
+</table>
 </div>
   <script>
 $('.pootis a.nig').on('click', function() {
 	var $store = $('input'),
 			$number = $('.call'),
-			dialed = $(this).text();
+			dialed = $(this).text()[1];
 
-	$store.val($store.val() + dialed);
+	$store.val($store.val() + ' ' + dialed + ' ');
 	$number.attr('href', 'tel:' + $store.val());
 	$store.focus();
 });
