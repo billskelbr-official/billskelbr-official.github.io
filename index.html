@@ -182,14 +182,14 @@ margin-left: -50px;
 <div class = "container">
   <input/>
 <table>
-  <tr class = "row pootis"> <td><a class="nig"> 1 </a></td>                                         <td><a class="nig"> 2 </a><br /><span class="texts">A B C</span></td> <td><a class="nig"> 3 </a><br /><span class="texts">D E F</span></td> </tr>
-  <tr class = "row pootis"> <td><a class="nig"> 4 </a><br /><span class="texts">G H I</span></td>   <td><a class="nig"> 5 </a><br /><span class="texts">J K L</span></td> <td><a class="nig"> 6 </a><br /><span class="texts">M N O</span></td> </tr>
-  <tr class = "row pootis"> <td><a class="nig"> 7 </a><br /><span class="texts">P Q R S</span></td> <td><a class="nig"> 8 </a><br /><span class="texts">T U V</span></td> <td><a class="nig"> 9 </a><br /><span class="texts">W X Y Z</span></td> </tr>
-  <tr class = "row pootis"> <td><a class="clear">Clear</a></td>                                     <td><a class="nig"> 0 </a></td>                                       <td><a class = "enter">Enter</a></td></tr>
+  <tr class = "row pootis"> <td class="nig"><a> 1 </a></td>                                         <td class="nig"><a> 2 </a><br /><span class="texts">A B C</span></td> <td class="nig"><a> 3 </a><br /><span class="texts">D E F</span></td> </tr>
+  <tr class = "row pootis"> <td class="nig"><a> 4 </a><br /><span class="texts">G H I</span></td>   <td class="nig"><a> 5 </a><br /><span class="texts">J K L</span></td> <td class="nig"><a> 6 </a><br /><span class="texts">M N O</span></td> </tr>
+  <tr class = "row pootis"> <td class="nig"><a> 7 </a><br /><span class="texts">P Q R S</span></td> <td class="nig"><a> 8 </a><br /><span class="texts">T U V</span></td> <td class="nig"><a> 9 </a><br /><span class="texts">W X Y Z</span></td> </tr>
+  <tr class = "row pootis"> <td class="clear"><a>Clear</a></td>                                     <td class="nig"><a> 0 </a></td>                                       <td class="enter"><a>Enter</a></td></tr>
 </table>
 </div>
   <script>
-$('.pootis a.nig').on('click', function() {
+$('.pootis .nig').on('click', function() {
 	var $store = $('input'),
 			$number = $('.call'),
 			dialed = $(this).text()[1];
@@ -199,7 +199,7 @@ $('.pootis a.nig').on('click', function() {
 	$store.focus();
 });
 
-$('.pootis a.clear').on('click', function() {
+$('.pootis .clear').on('click', function() {
 	var $store = $('input'),
 			$number = $('.call'),
 			dialed = $(this).text();
