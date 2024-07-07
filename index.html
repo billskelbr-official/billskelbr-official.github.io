@@ -222,7 +222,7 @@ console.log($("input").text());
 		num_attempts -= 1;
 		clear_input();
 		if (num_attempts > 0) {
-			document.getElementById("num_attempts").innerHTML = "Incorrect passcode. " + num_attempts + " attempts remaining."
+			document.getElementById("num_attempts").innerHTML = "Invalid passcode. " + num_attempts + " attempts remaining."
 		} else {
 			document.getElementById("num_attempts").innerHTML = "Incorrect Passcode! You ran out of attempts and your computer exploded. Press ctrl + R to try again."
 		}
