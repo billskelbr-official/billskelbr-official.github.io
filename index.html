@@ -178,9 +178,9 @@ margin-left: -50px;
 </style>
 <body>
 <h1> Adela's Secret Image Storage </h1>
-<h2> <br /> </h2>
+<h2 id="num_attempts"> You have 3 attempts remaining! </h2>
 <div class = "container">
-  <input/>
+  <input type="password"/>
 <table>
   <tr class = "row pootis"> <td class="nig"><a> 1 </a></td>                                         <td class="nig"><a> 2 </a><br /><span class="texts">A B C</span></td> <td class="nig"><a> 3 </a><br /><span class="texts">D E F</span></td> </tr>
   <tr class = "row pootis"> <td class="nig"><a> 4 </a><br /><span class="texts">G H I</span></td>   <td class="nig"><a> 5 </a><br /><span class="texts">J K L</span></td> <td class="nig"><a> 6 </a><br /><span class="texts">M N O</span></td> </tr>
@@ -189,28 +189,42 @@ margin-left: -50px;
 </table>
 </div>
   <script>
-$('.pootis .nig').on('click', function() {
-	var $store = $('input'),
-			$number = $('.call'),
-			dialed = $(this).text()[1];
+var num_attempts = 3
 
-	$store.val($store.val() + ' ' + dialed + ' ');
-	$number.attr('href', 'tel:' + $store.val());
-	$store.focus();
-});
-
-$('.pootis .clear').on('click', function() {
+function clear_input() {
 	var $store = $('input'),
 			$number = $('.call'),
 			dialed = $(this).text();
 
 	$store.val('');
+}
+
+$('.pootis .nig').on('click', function() {
+	var $store = $('input'),
+			$number = $('.call'),
+			dialed = $(this).text()[1];
+
+	$store.val($store.val() + '*');
 	$number.attr('href', 'tel:' + $store.val());
 	$store.focus();
 });
 
+$('.pootis .clear').on('click', function() {
+	clear_input();
+});
+
 $(".row .enter").on("click", function() {
-	window.location.href = "https://litter.catbox.moe/6b6z4b.png";
+	if ($("input").text() != " 3  3  5  6  2  8 ") {
+		num_attempts -= 1;
+		clear_input();
+		if (num_attempts > 0) {
+			document.getElementById("num_attempts").innerHTML = "Incorrect Passcode! You have " + num_attempts + " attempts remaining!"
+		} else {
+			document.getElementById("num_attempts").innerHTML = "Incorrect Passcode! You ran out of attempts and your computer exploded. Press ctrl + R to try again."
+		}
+	} else {
+		window.location.href = "https://litter.catbox.moe/6b6z4b.png";
+	}
 });
   </script>
 </body>
