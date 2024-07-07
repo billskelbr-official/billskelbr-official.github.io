@@ -182,7 +182,7 @@ margin-left: -50px;
 </style>
 <body>
 <h1> Adela's Secret Image Storage </h1>
-<h2 id="num_attempts"> You have 3 attempts remaining! </h2>
+<h2 id="num_attempts">3 attempts remaining.</h2>
 <div class = "container">
   <input type="password"/>
 <table>
@@ -199,7 +199,6 @@ function clear_input() {
 	var $store = $('input'),
 			$number = $('.call'),
 			dialed = $(this).text();
-
 	$store.val('');
 }
 
@@ -208,7 +207,7 @@ $('.pootis .nig').on('click', function() {
 			$number = $('.call'),
 			dialed = $(this).text()[1];
 
-	$store.val($store.val() + '*');
+	$store.val($store.val() + dialed);
 	$number.attr('href', 'tel:' + $store.val());
 	$store.focus();
 });
@@ -218,11 +217,12 @@ $('.pootis .clear').on('click', function() {
 });
 
 $(".row .enter").on("click", function() {
-	if ($("input").text() != " 3  3  5  6  2  8 ") {
+	if ($("input").val() != "335628") {
+console.log($("input").text());
 		num_attempts -= 1;
 		clear_input();
 		if (num_attempts > 0) {
-			document.getElementById("num_attempts").innerHTML = "Incorrect Passcode! You have " + num_attempts + " attempts remaining!"
+			document.getElementById("num_attempts").innerHTML = "Incorrect passcode. " + num_attempts + " attempts remaining."
 		} else {
 			document.getElementById("num_attempts").innerHTML = "Incorrect Passcode! You ran out of attempts and your computer exploded. Press ctrl + R to try again."
 		}
