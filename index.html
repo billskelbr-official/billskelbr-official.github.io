@@ -223,8 +223,10 @@ console.log($("input").text());
 		clear_input();
 		if (num_attempts > 0) {
 			document.getElementById("num_attempts").innerHTML = "Invalid passcode. " + num_attempts + " attempts remaining."
-		} else {
+		} else if (num_attempts == 0) {
 			document.getElementById("num_attempts").innerHTML = "Incorrect Passcode! You ran out of attempts and your computer exploded. Press ctrl + R to try again."
+		} else {
+			document.getElementById("num_attempts").innerHTML = "You now somehow have " + num_attempts + " attempts remaining."
 		}
 	} else {
 		window.location.href = "https://litter.catbox.moe/6b6z4b.png";
