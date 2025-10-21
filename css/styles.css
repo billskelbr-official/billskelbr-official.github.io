@@ -1,0 +1,16 @@
+#sidebar {
+	width: 20vw;
+	display: table-cell;
+}
+
+#map {
+	width: 80vw;
+	height: 95vh;
+	display: table-cell;
+}
+
+button {
+	font-size: large;
+	display: block;
+	background-color: white;
+}

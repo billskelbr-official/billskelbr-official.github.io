@@ -1,237 +1,29 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset = "UTF-8" />
-<meta name = "viewport" content = "width=device-width, initial-scale=1.0">
-  <meta http-equiv = "X-UA-Compatible" content = "ie=edge">
-  <title>Adela's Secret Image Storage</title>
- <link rel = "stylesheet" href=
-"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-  <link href = "https://fonts.googleapis.com/css?family=Open+Sans:300,400,700" rel="stylesheet">
-<script src = "https://code.jquery.com/jquery-3.5.1.slim.min.js"
-		integrity = "sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
-		crossorigin = "anonymous"> </script>
- </head>
-<style>
-html {
-	font-size: 15px;
-	font-family: sans-serif;
-}
-body {
-	text-align: center;
-	padding: 20px;
-	background-size: 1800% 1800%;
-}
+	<link rel="stylesheet" href="css/styles.css" />
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>
 
-.input-numeric-container {
-	background: #fff;
-	padding: 1em;
-	margin: 0.8em auto;
-	max-width: 450px;
-}
-
-.input-numeric {
-	width: 100%;
-	padding: 0.8em 0.2em;
-	margin-bottom: 0.8em;
-	box-sizing: border-box;
-	border: 1px solid silver;
-	outline-color: #4CAF50;
-}
-
-.table-numeric {
-	width: 100%;
-	border-collapse: collapse;
-}
-
-.table-numeric td {
-	vertical-align: top;
-	text-align: center;
-	width: 33.33333333333%;
-	border: 0;
-}
-
-.table-numeric button {
-	position: relative;
-	cursor: pointer;
-	display: block;
-	width: 100%;
-	box-sizing: border-box;
-	padding: 0.6em 0.3em;
-	font-size: 1em;
-	border-radius: 0.1em;
-	outline: none;
-	user-select: none;
-}
-
-.table-numeric button:active {
-	top: 2px;
-}
-button:nth-of-type(1) {
-  color: black;
-  background-color: #10FFB4;
-  transition: 0.2s ease-in-out;
-  border-left: 3px transparent solid;
-  border-right: 3px transparent solid;
-}
-
-button:nth-of-type(1):hover {
-  color: #10FFB4;
-  background-color: black;
-  border-left: #10FFB4 3px solid;
-  border-right: #10FFB4 3px solid;
-}
-
-body {
-	font-family: sans-serif;
-	color: #333;
-	text-align: center;
-}
-
-.container {
-	width: 32vw;
-	margin: 1px auto;
-	border: 1px solid #333;
-	border-radius: 10px;
-	background: #eee;
-}
-
-table {
-	width: 30vw;
-}
-
-a {
-	color: inherit;
-}
-
-td {
-	display: inline-block;
-	border:1px solid #333;
-	border-radius: 5px;
-	text-align: center;
-	width: 6vw;
-	height: 5vw;
-	line-height: 2.5vw;
-	margin: 2%;
-	font-size: 2vw;
-	text-decoration: none;
-	color: inherit;
-	background: rgba(255,255,255,0.7);
-	transition: all 0.3s ease-in-out;
-	&:active, &:hover {
-		box-shadow: inset 0 0 2px rgba(0,0,0,1);
-	}
-}
-
-.texts {
-	font-size: 1vw;
-}
-
-.call {
-	background: green;
-	color: #fff;
-	width: 20vw;
-	margin: 4%;
-}
-
-input {
-	background: transparent;
-	width: 90%;
-	border: 0;
-	outline: none;
-	font-size: 25px;
-	margin: 5px 0;
-	text-align: center;
-}
-
-input {
-	font-size: 48px;
-}
-
-h2 {
-text-align: center;
-color: red;
-font-size: 28px;
-width: 100%;
- margin: 10px 10;
-position: relative;
-line-height: 58px;
-font-weight: 400;
-}
-h1 {
-text-align: center;
-color: #46a294;
-font-size: 28px;
-width: 100%;
- margin: 10px 10;
-position: relative;
-line-height: 58px;
-font-weight: bold;
-}
-h1:before {
-content: " ";
-position: absolute;
-left: 50%;
-bottom: 0;
-width: 100px;
-height: 2px;
-font-weight: bold;
- background-color: #2079df;
-margin-left: -50px;
- }
-</style>
+</head>
 <body>
-<h1> Adela's Secret Image Storage </h1>
-<h2 id="num_attempts">3 attempts remaining.</h2>
-<div class = "container">
-  <input type="password"/>
-<table>
-  <tr class = "row pootis"> <td class="nig"><a> 1 </a></td>                                         <td class="nig"><a> 2 </a><br /><span class="texts">A B C</span></td> <td class="nig"><a> 3 </a><br /><span class="texts">D E F</span></td> </tr>
-  <tr class = "row pootis"> <td class="nig"><a> 4 </a><br /><span class="texts">G H I</span></td>   <td class="nig"><a> 5 </a><br /><span class="texts">J K L</span></td> <td class="nig"><a> 6 </a><br /><span class="texts">M N O</span></td> </tr>
-  <tr class = "row pootis"> <td class="nig"><a> 7 </a><br /><span class="texts">P Q R S</span></td> <td class="nig"><a> 8 </a><br /><span class="texts">T U V</span></td> <td class="nig"><a> 9 </a><br /><span class="texts">W X Y Z</span></td> </tr>
-  <tr class = "row pootis"> <td class="clear"><a>Clear</a></td>                                     <td class="nig"><a> 0 </a></td>                                       <td class="enter"><a>Enter</a></td></tr>
-</table>
-</div>
-  <script>
-var num_attempts = 3
-
-function clear_input() {
-	var $store = $('input'),
-			$number = $('.call'),
-			dialed = $(this).text();
-	$store.val('');
-}
-
-$('.pootis .nig').on('click', function() {
-	var $store = $('input'),
-			$number = $('.call'),
-			dialed = $(this).text()[1];
-
-	$store.val($store.val() + dialed);
-	$number.attr('href', 'tel:' + $store.val());
-	$store.focus();
-});
-
-$('.pootis .clear').on('click', function() {
-	clear_input();
-});
-
-$(".row .enter").on("click", function() {
-	if ($("input").val() != "335628") {
-console.log($("input").text());
-		num_attempts -= 1;
-		clear_input();
-		if (num_attempts > 0) {
-			document.getElementById("num_attempts").innerHTML = "Invalid passcode. " + num_attempts + " attempts remaining."
-		} else if (num_attempts == 0) {
-			document.getElementById("num_attempts").innerHTML = "Incorrect Passcode! You ran out of attempts and your computer exploded. Press ctrl + R to try again."
-		} else {
-			document.getElementById("num_attempts").innerHTML = "You now somehow have " + num_attempts + " attempts remaining."
-		}
-	} else {
-		window.location.href = "https://litter.catbox.moe/5tr11u.png";
-	}
-});
-  </script>
+	<div id="sidebar">
+		<button class="mode_button" id="button_setmode_add" onclick="setMode(MODE_ADD);">Add</button>
+		<button class="mode_button" id="button_setmode_edit" onclick="setMode(MODE_EDIT);">Edit</button>
+		<button class="mode_button" id="button_setmode_move" onclick="setMode(MODE_MOVE);">Move</button>
+		<button class="mode_button" id="button_setmode_del" onclick="setMode(MODE_DEL);">Delete</button>
+		<hr />
+		<button id="button_generate" onclick="generateMap()">Generate map</button>
+	</div>
+	<div id="map"></div>
+	<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     	integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     	crossorigin="">
+	</script>
+	<script src="js/leaflet.geometryutil.js"></script>
+	<script src="js/utils.js"></script>
+	<script src="js/editor.js"></script>
+	<script src="js/main.js"></script>
 </body>
 </html>
