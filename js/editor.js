@@ -2,6 +2,19 @@ const TRAIN_LENGTH = 4.2;
 const MARGIN_LENGTH = 5;
 const BUFFER_LENGTH = 2.5;
 
+const ROAD_COLOURS = [
+	"grey",
+	"black",
+	"blue",
+	"green",
+	"orange",
+	"purple",
+	"red",
+	"white",
+	"yellow"
+]
+const NUM_COLOURS = ROAD_COLOURS.length;
+
 var mode_add_point1 = null;
 
 function setMode(m)
@@ -33,33 +46,51 @@ function setMode(m)
 
 function resetMode()
 {
-	mode_add_point1 = null;
+	if (mode_add_point1 != null) {
+		mode_add_point1.setStyle({color: "#3388ff"});
+		mode_add_point1 = null;
+	}
 }
 
 function addMkr(location, name)
 {
-	var m = new L.Circle(location, {radius: 150, bubblingMouseEvents: false}).addTo(map);
-	m.bindTooltip(name, {permanent: true}).openTooltip();
+	var m = new L.Circle(location, {radius: 150, bubblingMouseEvents: false}).addTo(places_layer);
+	m.bindTooltip(name, {permanent: true, interactive: true, bubblingMouseEvents: false}).openTooltip();
 	m.on(
 		"click",
-		function(mkr) {
-			mkrClick(mkr);
+		mkrClick
+	);
+	m.getTooltip().on(
+		"click",
+		function() {
+			click_on(m.getElement());
 		}
-	)
+	);
+	return m;
 }
 
 function mkrClick(mkr)
 {
-	mkr = mkr.sourceTarget;
+	mkr = mkr.target;
 
 	if (mode == MODE_DEL) {
-		for (var i = 0; i < places.length; i++) {
-			if (places[i].loc == mkr.getLatLng()) {
-				places = places.filter(function(item) {
-    				return item !== places[i];
+		for (var i = 0; i < roads.length; i++) {
+			var p0 = find_place_with_id(roads[i].points[0]);
+			var p1 = find_place_with_id(roads[i].points[1]);
+			if (p0.loc == mkr.getLatLng() || p1.loc == mkr.getLatLng()) {
+				for (var j = 0; j < roads[i].lines.length; j++) {
+					roads[i].lines[j].bg.remove();
+					roads[i].lines[j].fill.remove();
+				}
+				roads = roads.filter(function(item) {
+					return item != roads[i];
 				})
+				break;
 			}
 		}
+		places = places.filter(function(item) {
+    		return item.loc != mkr.getLatLng()
+		})
 		mkr.remove();
 		return;
 	}
@@ -69,42 +100,50 @@ function mkrClick(mkr)
 			mode_add_point1 = mkr;
 			mkr.setStyle({color: "red"});
 		} else {
-			var point1;
-			var point2;
-
-			if (mode_add_point1 == mkr) {
-				mkr.setStyle({color: "#3388ff"});
-				mode_add_point1 = null;
-				return;
-			}
-
-			for (var i = 0; i < places.length; i++) {
-				if (places[i].loc == mode_add_point1.getLatLng()) {
-					point1 = places[i];
-				}
-			}
-			for (var i = 0; i < places.length; i++) {
-				if (places[i].loc == mkr.getLatLng()) {
-					point2 = places[i];
-				}
-			}
-
+			createRoad(mode_add_point1, mkr);
 			mode_add_point1.setStyle({color: "#3388ff"});
 			mode_add_point1 = null;
-
-			for (var i = 0; i < roads.length; i++) {
-				if ((roads[i].points[0] == point1.id && roads[i].points[1] == point2.id) || (roads[i].points[0] == point2.id && roads[i].points[1] == point1.id)) {
-					roads[i].lanes += 1;
-					return;
-				}
-			}
-			roads.push({points: [point1.id, point2.id], lanes: 1});
-			L.polyline([point1.loc, point2.loc], {weight: 5}).addTo(map);
 		}
+	}
+
+	if (mode == MODE_EDIT) {
+		var tgt = find_place_with_latlng(mkr.getLatLng());
+		if (tgt == null) {
+			abort();
+		}
+		var newname = prompt("New name for <"+tgt.name+">");
+		if (newname == null) {
+			return;
+		}
+		tgt.name = newname;
+		tgt.mkr.getTooltip().setContent(newname);
 	}
 }
 
-function createPlace(e)
+function lineClick(deets)
+{
+	if (mode == MODE_ADD) {
+		createRoad(deets.ends[0].mkr, deets.ends[1].mkr);
+		return;
+	}
+
+	if (mode == MODE_EDIT) {
+		var rd = find_road_with_ids([deets.ends[0].id, deets.ends[1].id]);
+		var str = "Enter new colour id (was " + rd.colours[deets.lane] + "); defaults to grey\n";
+		for (var i = 0; i < NUM_COLOURS; i++) {
+			str += "\t" + i + "\t" + ROAD_COLOURS[i] + "\n";
+		}
+		var newColour = prompt(str);
+		newColour %= NUM_COLOURS;
+		if (newColour == NaN) {
+			newColour = 0;
+		}
+		rd.colours[deets.lane] = newColour;
+		rd.lines[deets.lane].fill.setStyle({color: ROAD_COLOURS[newColour]});
+	}
+}
+
+function mapClickHandler(e)
 {
 	if (mode != MODE_ADD) {
 		return;
@@ -113,9 +152,81 @@ function createPlace(e)
 	if (name == null) {
 		return;
 	}
-	places.push({id: nextLocId++, loc: e.latlng, name: name});
+	createPlace(e.latlng, name);
+}
 
-	addMkr(e.latlng, name);
+function createPlace(loc, name)
+{
+	if (mode != MODE_ADD) {
+		return;
+	}
+
+	places.push({id: nextLocId++, loc: loc, name: name, mkr: addMkr(loc, name)});
+}
+
+function createRoad(mkr0, mkr1)
+{
+	var point1 = null;
+	var point2 = null;
+
+	if (mkr0.getLatLng() == mkr1.getLatLng()) {
+		return null;
+	}
+
+	point1 = find_place_with_latlng(mkr0.getLatLng());
+	point2 = find_place_with_latlng(mkr1.getLatLng());
+	if (point1.id > point2.id) {
+		var tmp = point1;
+		point1 = point2;
+		point2 = tmp;
+	}
+
+	var colour = Math.floor(Math.random() * (NUM_COLOURS +1));
+
+	var target = null;
+	for (var i = 0; i < roads.length; i++) {
+		if ((roads[i].points[0] == point1.id && roads[i].points[1] == point2.id) || (roads[i].points[0] == point2.id && roads[i].points[1] == point1.id)) {
+			target = roads[i];
+			break;
+		}
+	}
+	if (target == null) {
+		var obj = {points: [point1.id, point2.id], lanes: 0, colours: [], lines: []};
+		roads.push(obj);
+		target = roads[roads.length-1];
+	}
+
+	if (target.lanes == 3) {
+		alert("cannot have more than 3 lanes!");
+		return;
+	}
+
+	var bearing = (L.GeometryUtil.bearing(point1.loc, point2.loc) + (target.lanes == 2 ? 90 : 270)) % 360 - 180;
+	var np1 = L.GeometryUtil.destination(point1.loc, bearing, target.lanes == 0 ? 0 : 50);
+	var np2 = L.GeometryUtil.destination(point2.loc, bearing, target.lanes == 0 ? 0 : 50);
+
+	var deets = {ends: [point1, point2], lane: target.lanes};
+	var bgline = L.polyline([np1, np2], {customData: deets, weight: 10, color: "black", bubblingMouseEvents: false}).addTo(roads_layer).on("click", function(){lineClick(deets)})
+	var fillline = L.polyline([np1, np2], {customData: deets, weight: 8, color: ROAD_COLOURS[colour], bubblingMouseEvents: false}).addTo(roads_layer).bringToBack().on("click", function(){lineClick(deets)})
+	bgline.bringToBack();
+
+	var lines = {
+		bg: bgline,
+		fill: fillline
+	};
+
+	target.colours.push(colour);
+	target.lines.push(lines);
+	target.lanes += 1;
+	return;
+}
+
+function clearRoad(road)
+{
+	for (var i = 0; i < road.lines.length; i++) {
+		road.lines[i].bg.remove();
+		road.lines[i].fill.remove();
+	}
 }
 
 function generateMap()
@@ -239,7 +350,7 @@ function generateMap()
 		for (var j = 0; j < roads[i].lanes; j++) {
 			lanes.push({
 				id: lane_id++,
-				colour: "grey",
+				colour: ROAD_COLOURS[roads[i].colours[j]],
 				wildcardAmount: 0
 			});
 		}
