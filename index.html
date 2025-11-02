@@ -9,6 +9,11 @@
 </head>
 <body>
 	<div id="sidebar">
+		<button id="config" onclick="configure()">Configure...</button>
+		<hr />
+		<input id="filepicker" type="file" />
+		<button id="button_import" onclick="importButtonHandler()">Import from JSON</button>
+		<hr />
 		<button class="mode_button" id="button_setmode_add" onclick="setMode(MODE_ADD);">Add</button>
 		<button class="mode_button" id="button_setmode_edit" onclick="setMode(MODE_EDIT);">Edit</button>
 		<!--<button class="mode_button" id="button_setmode_move" onclick="setMode(MODE_MOVE);">Move</button>-->

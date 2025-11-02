@@ -16,6 +16,26 @@ const ROAD_COLOURS = [
 const NUM_COLOURS = ROAD_COLOURS.length;
 
 var mode_add_point1 = null;
+var config = {
+	circle_radius: 150
+}
+
+function configure()
+{
+	var resp = prompt(
+		"Radius of point markers in metres (was " + config.circle_radius +")\n" +
+		"Note that small radii may result in multilane roads being displayed weirdly"
+	);
+	/* both if resp == null or "0" */
+	if (Number(resp) == 0) {
+		return;
+	}
+	config.circle_radius = Number(resp);
+
+	for (var i = 0; i < places.length; i++) {
+		places[i].mkr.setRadius(config.circle_radius);
+	}
+}
 
 function setMode(m)
 {
@@ -54,7 +74,7 @@ function resetMode()
 
 function addMkr(location, name)
 {
-	var m = new L.Circle(location, {radius: 150, bubblingMouseEvents: false}).addTo(places_layer);
+	var m = new L.Circle(location, {radius: config.circle_radius, bubblingMouseEvents: false}).addTo(places_layer);
 	m.bindTooltip(name, {permanent: true, interactive: true, bubblingMouseEvents: false}).openTooltip();
 	m.on(
 		"click",
@@ -96,7 +116,7 @@ function mkrClick(mkr)
 			mode_add_point1 = mkr;
 			mkr.setStyle({color: "red"});
 		} else {
-			createRoad(mode_add_point1, mkr);
+			buildNewRoad(find_place_with_latlng(mode_add_point1.getLatLng()), find_place_with_latlng(mkr.getLatLng()));
 			mode_add_point1.setStyle({color: "#3388ff"});
 			mode_add_point1 = null;
 		}
@@ -119,7 +139,7 @@ function mkrClick(mkr)
 function lineClick(deets)
 {
 	if (mode == MODE_ADD) {
-		createRoad(deets.ends[0].mkr, deets.ends[1].mkr);
+		buildNewRoad(deets.ends[0], deets.ends[1]);
 		return;
 	}
 
@@ -148,36 +168,40 @@ function mapClickHandler(e)
 	if (name == null) {
 		return;
 	}
-	createPlace(e.latlng, name);
+	createPlace(nextLocId++, e.latlng, name);
 }
 
-function createPlace(loc, name)
+function createPlace(id, loc, name)
 {
 	if (mode != MODE_ADD) {
 		return;
 	}
 
-	places.push({id: nextLocId++, loc: loc, name: name, mkr: addMkr(loc, name)});
+	places.push({id: id, loc: loc, name: name, mkr: addMkr(loc, name)});
 }
 
-function createRoad(mkr0, mkr1)
+function buildNewRoad(pt0, pt1)
+{
+	createRoad(pt0, pt1, Math.floor(Math.random() * (NUM_COLOURS)));
+}
+
+
+function createRoad(from, to, colour)
 {
 	var point1 = null;
 	var point2 = null;
 
-	if (mkr0.getLatLng() == mkr1.getLatLng()) {
+	if (from.loc == to.loc) {
 		return null;
 	}
 
-	point1 = find_place_with_latlng(mkr0.getLatLng());
-	point2 = find_place_with_latlng(mkr1.getLatLng());
+	point1 = from;
+	point2 = to;
 	if (point1.id > point2.id) {
 		var tmp = point1;
 		point1 = point2;
 		point2 = tmp;
 	}
-
-	var colour = Math.floor(Math.random() * (NUM_COLOURS));
 
 	var target = null;
 	for (var i = 0; i < roads.length; i++) {
@@ -222,6 +246,71 @@ function clearRoad(road)
 	for (var i = 0; i < road.lines.length; i++) {
 		road.lines[i].bg.remove();
 		road.lines[i].fill.remove();
+	}
+}
+
+function importButtonHandler()
+{
+	const selectedFile = document.getElementById("filepicker").files[0];
+	const fr = new FileReader();
+	fr.onload = () => {
+		importMap(fr.result);
+	};
+	fr.readAsText(selectedFile);
+}
+
+function importMap(str)
+{
+	var obj;
+	var origin;
+	var bound;
+	var dim;
+	var max_place_id = -1;
+
+	places = [];
+	roads = [];
+	places_layer.clearLayers();
+	roads_layer.clearLayers();
+
+	try {
+		obj = JSON.parse(str);
+	} catch {
+		alert("fatal error: malformed input file");
+		return;
+	}
+
+	origin = {lat: obj.boundingBox.bottom, lng: obj.boundingBox.left};
+	bound = {lat: obj.boundingBox.top, lng: obj.boundingBox.right};
+	dim = obj.dimensions.full;
+	for (var i = 0; i < obj.places.length; i++) {
+		var p = obj.places[i];
+		createPlace(
+			p.id,
+			{
+				lat: origin.lat + p.coordinate.y / dim.height * (bound.lat - origin.lat),
+				lng: origin.lng + p.coordinate.x / dim.width * (bound.lng - origin.lng)
+			},
+			p.name,
+		);
+		if (p.id > max_place_id) {
+			max_place_id = p.id;
+		}
+	}
+	nextLocId = max_place_id + 1;
+	for (var i = 0; i < obj.roads.length; i++) {
+		var r = obj.roads[i];
+		var from = find_place_with_id(r.placeIds[0]);
+		var to = find_place_with_id(r.placeIds[1]);
+		for (var j = 0; j < r.lanes.length; j++) {
+			var c = 0;
+			for (var k = 0; k < NUM_COLOURS; k++) {
+				if (ROAD_COLOURS[k] == r.lanes[j].colour) {
+					c = k;
+					break;
+				}
+			}
+			createRoad(from, to, c);
+		}
 	}
 }
 
