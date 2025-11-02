@@ -1,4 +1,4 @@
-const TRAIN_LENGTH = 4.2;
+const TRAIN_LENGTH = 2.5;
 const MARGIN_LENGTH = 5;
 const BUFFER_LENGTH = 2.5;
 
@@ -74,20 +74,16 @@ function mkrClick(mkr)
 	mkr = mkr.target;
 
 	if (mode == MODE_DEL) {
-		for (var i = 0; i < roads.length; i++) {
-			var p0 = find_place_with_id(roads[i].points[0]);
-			var p1 = find_place_with_id(roads[i].points[1]);
-			if (p0.loc == mkr.getLatLng() || p1.loc == mkr.getLatLng()) {
-				for (var j = 0; j < roads[i].lines.length; j++) {
-					roads[i].lines[j].bg.remove();
-					roads[i].lines[j].fill.remove();
-				}
-				roads = roads.filter(function(item) {
-					return item != roads[i];
-				})
-				break;
+		var obj = find_place_with_latlng(mkr.getLatLng());
+		var del_arr = roads.filter(function(item){return item.points[0] == obj.id || item.points[1] == obj.id});
+		for (var i = 0; i < del_arr.length; i++) {
+			for (var j = 0; j < del_arr[i].lines.length; j++) {
+				del_arr[i].lines[j].bg.remove();
+				del_arr[i].lines[j].fill.remove();
 			}
 		}
+		roads = roads.filter(function(item){return item.points[0] != obj.id && item.points[1] != obj.id});
+
 		places = places.filter(function(item) {
     		return item.loc != mkr.getLatLng()
 		})
@@ -181,7 +177,7 @@ function createRoad(mkr0, mkr1)
 		point2 = tmp;
 	}
 
-	var colour = Math.floor(Math.random() * (NUM_COLOURS +1));
+	var colour = Math.floor(Math.random() * (NUM_COLOURS));
 
 	var target = null;
 	for (var i = 0; i < roads.length; i++) {
@@ -294,9 +290,8 @@ function generateMap()
 	}
 
 	/* add MARGIN_LENGTH cm border from all points */
-
-	var true_bound_bl = L.GeometryUtil.destination({lat: miny, lng: minx}, 225.0, min_length * 1.41421356237 * MARGIN_LENGTH / TRAIN_LENGTH);
-	var true_bound_tr = L.GeometryUtil.destination({lat: maxy, lng: maxx}, 45.0, min_length * 1.41421356237 * MARGIN_LENGTH / TRAIN_LENGTH);
+	var true_bound_bl = L.GeometryUtil.destination({lat: miny, lng: minx}, 225.0, min_length * 1.41421356237 * MARGIN_LENGTH / (TRAIN_LENGTH + BUFFER_LENGTH));
+	var true_bound_tr = L.GeometryUtil.destination({lat: maxy, lng: maxx}, 45.0, min_length * 1.41421356237 * MARGIN_LENGTH / (TRAIN_LENGTH + BUFFER_LENGTH));
 	miny = true_bound_bl.lat;
 	minx = true_bound_bl.lng;
 	maxy = true_bound_tr.lat;
@@ -304,8 +299,8 @@ function generateMap()
 
 	var real_x = map.distance({lat: miny, lng: minx}, {lat: miny, lng: maxx});
 	var real_y = map.distance({lat: miny, lng: minx}, {lat: maxy, lng: minx});
-	var dimx = real_x / min_length * TRAIN_LENGTH + BUFFER_LENGTH;
-	var dimy = real_y / min_length * TRAIN_LENGTH + BUFFER_LENGTH;
+	var dimx = real_x / min_length * (TRAIN_LENGTH + BUFFER_LENGTH);
+	var dimy = real_y / min_length * (TRAIN_LENGTH + BUFFER_LENGTH);
 
 	destobj.dimensions = {
 		full: {
@@ -331,8 +326,8 @@ function generateMap()
 			id: places[i].id,
 			name: places[i].name,
 			coordinate: {
-				x: map.distance(places[i].loc, {lat: places[i].loc.lat, lng: minx}) / min_length * TRAIN_LENGTH - 1.5,
-				y: map.distance(places[i].loc, {lat: miny, lng: places[i].loc.lng}) / min_length * TRAIN_LENGTH - 1.5
+				x: map.distance(places[i].loc, {lat: places[i].loc.lat, lng: minx}) / min_length * (TRAIN_LENGTH + BUFFER_LENGTH) - 1.25,
+				y: map.distance(places[i].loc, {lat: miny, lng: places[i].loc.lng}) / min_length * (TRAIN_LENGTH + BUFFER_LENGTH) - 1.25
 			},
 			label: {
 				offset: {x: 0, y: 0},
@@ -359,11 +354,15 @@ function generateMap()
 			placeIds: roads[i].points,
 			spaceAmount:
 				Math.floor(
-					((map.distance(
-						find_place_with_id(roads[i].points[0]).loc,
-						find_place_with_id(roads[i].points[1]).loc
+					(
+						(
+							map.distance(
+								find_place_with_id(roads[i].points[0]).loc,
+								find_place_with_id(roads[i].points[1]).loc
+							)
+							/ min_length * (TRAIN_LENGTH + BUFFER_LENGTH)
+						) - BUFFER_LENGTH
 					)
-					/ min_length * (TRAIN_LENGTH + BUFFER_LENGTH)) - BUFFER_LENGTH)
 					/ TRAIN_LENGTH
 				),
 			lanes: lanes,
