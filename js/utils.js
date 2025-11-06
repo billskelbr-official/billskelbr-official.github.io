@@ -16,7 +16,7 @@ function find_place_with_id(id)
 function find_place_with_latlng(latlng)
 {
 	for (var i = 0; i < places.length; i++) {
-		if (places[i].loc == latlng) {
+		if (places[i].loc.lat == latlng.lat && places[i].loc.lng == latlng.lng) {
 			return places[i];
 		}
 	}

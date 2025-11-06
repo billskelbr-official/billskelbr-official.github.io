@@ -95,6 +95,10 @@ function mkrClick(mkr)
 
 	if (mode == MODE_DEL) {
 		var obj = find_place_with_latlng(mkr.getLatLng());
+		if (obj == undefined) {
+			alert("error: no place with location " + mkr.getLatLng());
+			return;
+		}
 		var del_arr = roads.filter(function(item){return item.points[0] == obj.id || item.points[1] == obj.id});
 		for (var i = 0; i < del_arr.length; i++) {
 			for (var j = 0; j < del_arr[i].lines.length; j++) {
@@ -184,10 +188,6 @@ function mapClickHandler(e)
 
 function createPlace(id, loc, name)
 {
-	if (mode != MODE_ADD) {
-		return;
-	}
-
 	places.push({id: id, loc: loc, name: name, mkr: addMkr(loc, name)});
 }
 
@@ -355,6 +355,11 @@ function importMapFromSaved(str)
 	for (var i = 0; i < roads_arr.length; i++) {
 		var from = find_place_with_id(roads_arr[i].points[0]);
 		var to = find_place_with_id(roads_arr[i].points[1]);
+
+		if (from == undefined || to == undefined) {
+			alert("error: failed to build road: " + roads_arr[i].points);
+			return;
+		}
 
 		for (var j = 0; j < roads_arr[i].lanes; j++) {
 			createRoad(from, to, roads_arr[i].colours[j]);
