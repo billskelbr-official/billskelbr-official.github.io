@@ -109,7 +109,7 @@ function mkrClick(mkr)
 		roads = roads.filter(function(item){return item.points[0] != obj.id && item.points[1] != obj.id});
 
 		places = places.filter(function(item) {
-    		return item.loc != mkr.getLatLng()
+    		return item.id != obj.id;
 		})
 		mkr.remove();
 		return;
