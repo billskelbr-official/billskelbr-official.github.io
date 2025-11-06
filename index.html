@@ -12,7 +12,8 @@
 		<button id="config" onclick="configure()">Configure...</button>
 		<hr />
 		<input id="filepicker" type="file" />
-		<button id="button_import" onclick="importButtonHandler()">Import from JSON</button>
+		<button id="button_import" onclick="importButtonHandler(importMapFromBoard)">Import from board</button>
+		<button id="button_import" onclick="importButtonHandler(importMapFromSaved)">Import from saved</button>
 		<hr />
 		<button class="mode_button" id="button_setmode_add" onclick="setMode(MODE_ADD);">Add</button>
 		<button class="mode_button" id="button_setmode_edit" onclick="setMode(MODE_EDIT);">Edit</button>
@@ -20,6 +21,7 @@
 		<button class="mode_button" id="button_setmode_del" onclick="setMode(MODE_DEL);">Delete</button>
 		<hr />
 		<button id="button_generate" onclick="generateMap()">Generate map</button>
+		<button id="button_save" onclick="saveMap()">Save map</button>
 	</div>
 	<div id="map"></div>
 	<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"

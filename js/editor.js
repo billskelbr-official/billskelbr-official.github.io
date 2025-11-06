@@ -143,6 +143,17 @@ function lineClick(deets)
 		return;
 	}
 
+	if (mode == MODE_DEL) {
+		var road = find_road_with_ids([deets.ends[0].id, deets.ends[1].id]);
+		if (road == undefined) {
+			alert("error: nonexistent road");
+			return;
+		}
+		clearRoad(road);
+		roads = roads.filter(function(item){return item != road});
+		return;
+	}
+
 	if (mode == MODE_EDIT) {
 		var rd = find_road_with_ids([deets.ends[0].id, deets.ends[1].id]);
 		var str = "Enter new colour id (was " + rd.colours[deets.lane] + "); defaults to grey\n";
@@ -249,17 +260,21 @@ function clearRoad(road)
 	}
 }
 
-function importButtonHandler()
+function importButtonHandler(func_ptr)
 {
 	const selectedFile = document.getElementById("filepicker").files[0];
+	if (selectedFile == undefined) {
+		alert("no file selected!");
+		return;
+	}
 	const fr = new FileReader();
 	fr.onload = () => {
-		importMap(fr.result);
+		func_ptr(fr.result);
 	};
 	fr.readAsText(selectedFile);
 }
 
-function importMap(str)
+function importMapFromBoard(str)
 {
 	var obj;
 	var origin;
@@ -310,6 +325,39 @@ function importMap(str)
 				}
 			}
 			createRoad(from, to, c);
+		}
+	}
+}
+
+function importMapFromSaved(str)
+{
+	var obj = JSON.parse(str);
+	var places_arr = obj.places;
+	var roads_arr = obj.roads;
+
+	if (places_arr == undefined || roads_arr == undefined) {
+		alert("malformed JSON; did you mean to try importing from board?")
+		return;
+	}
+
+	places = [];
+	roads = [];
+	places_layer.clearLayers();
+	roads_layer.clearLayers();
+
+	nextLocId = 0;
+	for (var i = 0; i < places_arr.length; i++) {
+		if (places_arr[i].id > nextLocId) {
+			nextLocId = places_arr[i].id + 1;
+		}
+		createPlace(places_arr[i].id, places_arr[i].loc, places_arr[i].name);
+	}
+	for (var i = 0; i < roads_arr.length; i++) {
+		var from = find_place_with_id(roads_arr[i].points[0]);
+		var to = find_place_with_id(roads_arr[i].points[1]);
+
+		for (var j = 0; j < roads_arr[i].lanes; j++) {
+			createRoad(from, to, roads_arr[i].colours[j]);
 		}
 	}
 }
@@ -477,4 +525,18 @@ function generateMap()
 	};
 
 	write2file("board.json", JSON.stringify(destobj));
+}
+
+function saveMap()
+{
+	var obj = {places:[], roads:[]};
+
+	for (var i = 0; i < places.length; i++) {
+		obj.places.push({id: places[i].id, loc: places[i].loc, name: places[i].name});
+	}
+	for (var i = 0; i < roads.length; i++) {
+		obj.roads.push({points: roads[i].points, lanes: roads[i].lanes, colours: roads[i].colours});
+	}
+
+	write2file("saved_map.json", JSON.stringify(obj));
 }
