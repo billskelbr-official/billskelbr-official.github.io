@@ -59,3 +59,24 @@ function click_on(el)
 {
 	el.dispatchEvent(new Event("click", {bubbles: true}))
 }
+
+function rand_up_to(max)
+{
+	return Math.floor(Math.random() * (max + 1));
+}
+
+function debug_find_disconnected_nodes()
+{
+	for (var i = 0; i < places.length; i++) {
+		var has_road = false;
+			for (var j = 0; j < roads.length; j++) {
+			if (roads[j].points[0] == places[i].id || roads[j].points[1] == places[i].id) {
+			has_road = true;
+					break;
+			}
+		}
+		if (has_road == false) {
+			console.log("id "+places[i].id+" (index "+i+") has no road!")
+		}
+	}
+}

@@ -2,6 +2,8 @@ const TRAIN_LENGTH = 2.5;
 const MARGIN_LENGTH = 5;
 const BUFFER_LENGTH = 2.5;
 
+const MIN_MISSION_DISTANCE = 14;
+
 const ROAD_COLOURS = [
 	"grey",
 	"black",
@@ -193,9 +195,8 @@ function createPlace(id, loc, name)
 
 function buildNewRoad(pt0, pt1)
 {
-	createRoad(pt0, pt1, Math.floor(Math.random() * (NUM_COLOURS)));
+	createRoad(pt0, pt1, rand_up_to(NUM_COLOURS-1));
 }
-
 
 function createRoad(from, to, colour)
 {
@@ -222,7 +223,7 @@ function createRoad(from, to, colour)
 		}
 	}
 	if (target == null) {
-		var obj = {points: [point1.id, point2.id], lanes: 0, colours: [], lines: []};
+		var obj = {points: [point1.id, point2.id], lanes: 0, colours: [], lines: [], len: -1};
 		roads.push(obj);
 		target = roads[roads.length-1];
 	}
@@ -458,9 +459,6 @@ function generateMap()
 			height: dimy * 120
 		}
 	};
-	destobj.rules = {
-		vehicleAmount: 1
-	};
 
 	destobj.places = []
 	for (var i = 0; i < places.length; i++) {
@@ -491,32 +489,41 @@ function generateMap()
 				wildcardAmount: 0
 			});
 		}
+		roads[i].len =
+			Math.floor(
+				(
+					(
+						map.distance(
+							find_place_with_id(roads[i].points[0]).loc,
+							find_place_with_id(roads[i].points[1]).loc
+						)
+						/ min_length * (TRAIN_LENGTH + BUFFER_LENGTH)
+					) - BUFFER_LENGTH
+				)
+				/ TRAIN_LENGTH
+			);
+
 		destobj.roads.push({
 			id: next_id++,
 			placeIds: roads[i].points,
-			spaceAmount:
-				Math.floor(
-					(
-						(
-							map.distance(
-								find_place_with_id(roads[i].points[0]).loc,
-								find_place_with_id(roads[i].points[1]).loc
-							)
-							/ min_length * (TRAIN_LENGTH + BUFFER_LENGTH)
-						) - BUFFER_LENGTH
-					)
-					/ TRAIN_LENGTH
-				),
+			spaceAmount: roads[i].len,
 			lanes: lanes,
 			curvature: 0
 		});
 	}
 
-	destobj.routeDecks = {
-		standard: [],
-		hotspots: [],
-		highways: [],
+	destobj.routeDecks = generateMissions();
+
+	var max_mission = 0;
+	for (var i = 0; i < destobj.routeDecks.length; i++) {
+		if (max_mission < destobj.routeDecks[i].score) {
+			max_mission = destobj.routeDecks[i].score;
+		}
+	}
+	destobj.rules = {
+		vehicleAmount: Math.floor(max_mission * 2 * 1.2)
 	};
+
 
 	destobj.placements = {
 		attribution: {x: 0, y: 0}
@@ -532,6 +539,86 @@ function generateMap()
 	write2file("board.json", JSON.stringify(destobj));
 }
 
+function generateMissions()
+{
+	var ret = {
+		standard: [],
+		hotspots: [],
+		highways: [],
+	};
+	var min_lengths = [];
+	var mission_id = 0;
+
+	index_lookup(-1);
+
+	for (var i = 0; i < places.length; i++) {
+		min_lengths.push(dijkstra(places[i]));
+	}
+
+	for (var i = 0; i < places.length; i++) {
+		var ids;
+		var min_dist = 0;
+		while (min_dist < MIN_MISSION_DISTANCE) {
+			ids = [places[i].id, places[rand_up_to(places.length - 1)].id];
+			min_dist = min_lengths[index_lookup(ids[0])][index_lookup(ids[1])];
+		}
+		ret.standard.push({
+			id: mission_id++,
+			placeIds: ids,
+			score: Math.floor(min_dist / 2)
+		});
+	}
+
+	return ret;
+}
+
+function dijkstra(point)
+{
+	var ret = [];
+	var stack = [];
+	for (var i = 0; i <= places.length; i++) {
+		ret.push(999999999);
+	}
+
+	ret[index_lookup(point.id)] = 0;
+	stack.push([0, point.id]);
+
+	while (stack.length > 0) {
+		var cur = stack.pop();
+		var adjacent = [];
+		for (var i = 0; i < roads.length; i++) {
+			if (roads[i].points[0] == cur[1]) {
+				adjacent.push([roads[i].len, roads[i].points[1]]);
+			} else if (roads[i].points[1] == cur[1]) {
+				adjacent.push([roads[i].len, roads[i].points[0]]);
+			}
+		}
+		for (var i = 0; i < adjacent.length; i++) {
+			if (ret[index_lookup(adjacent[i][1])] > (ret[index_lookup(cur[1])] + adjacent[i][0])) {
+				ret[index_lookup(adjacent[i][1])] = (ret[index_lookup(cur[1])] + adjacent[i][0]);
+				stack.push([ret[adjacent[i][1]], adjacent[i][1]]);
+			}
+		}
+	}
+
+	return ret;
+
+}
+
+/*  this is global because i can't static it  */
+var index_lookup_table = {};
+function index_lookup(id)
+{
+	if (id == -1) {
+		index_lookup_table = {};
+		for (var i = 0; i < places.length; i++) {
+			index_lookup_table[places[i].id] = i;
+		}
+		return;
+	}
+	return index_lookup_table[id];
+}
+
 function saveMap()
 {
 	var obj = {places:[], roads:[]};
@@ -540,7 +627,7 @@ function saveMap()
 		obj.places.push({id: places[i].id, loc: places[i].loc, name: places[i].name});
 	}
 	for (var i = 0; i < roads.length; i++) {
-		obj.roads.push({points: roads[i].points, lanes: roads[i].lanes, colours: roads[i].colours});
+		obj.roads.push({points: roads[i].points, lanes: roads[i].lanes, colours: roads[i].colours, len: -1});
 	}
 
 	write2file("saved_map.json", JSON.stringify(obj));
