@@ -348,7 +348,7 @@ function importMapFromSaved(str)
 
 	nextLocId = 0;
 	for (var i = 0; i < places_arr.length; i++) {
-		if (places_arr[i].id > nextLocId) {
+		if (places_arr[i].id >= nextLocId) {
 			nextLocId = places_arr[i].id + 1;
 		}
 		createPlace(places_arr[i].id, places_arr[i].loc, places_arr[i].name);
@@ -471,7 +471,7 @@ function generateMap()
 			},
 			label: {
 				offset: {x: 0, y: 0},
-				dimensions: {width: 2, height: 0.6},
+				dimensions: {width: 8, height: 0.6},
 				isValidPlacement: true
 			}
 		});
@@ -512,12 +512,14 @@ function generateMap()
 		});
 	}
 
+	destobj.regions = [];
+
 	destobj.routeDecks = generateMissions();
 
 	var max_mission = 0;
-	for (var i = 0; i < destobj.routeDecks.length; i++) {
-		if (max_mission < destobj.routeDecks[i].score) {
-			max_mission = destobj.routeDecks[i].score;
+	for (var i = 0; i < destobj.routeDecks.standard.length; i++) {
+		if (max_mission < destobj.routeDecks.standard[i].score) {
+			max_mission = destobj.routeDecks.standard[i].score;
 		}
 	}
 	destobj.rules = {
