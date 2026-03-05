@@ -1,0 +1,33 @@
+#top {
+	height: 20vh;
+}
+
+#map {
+	height: 60vh;
+}
+
+#bottom {
+	height: 20vh;
+}
+
+.tabletitle {
+	width: 20vw;
+}
+
+.tablecell {
+	width: 40vw;
+}
+
+.p1bg {
+	background: maroon;
+	color: white;
+}
+.p2bg {
+	background: navy;
+	color: white;
+}
+
+#yourteam {
+	text-align: center;
+	height: 2vw;
+}

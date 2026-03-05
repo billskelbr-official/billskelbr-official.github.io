@@ -1,0 +1,36 @@
+{
+	turn_number: int (turn number, incremented by 1 each turn),
+	turn: int (whose turn it is, either 1 or 2),
+	money: [
+		int (p1 money),
+		int (p2 money)
+	],
+	board: {
+		bases: [
+			{
+				id: int (base id),
+				occupier: obj (card)
+			}, ...
+		],
+		areas: [
+			{
+				id: int (area id),
+				money: int (amt of money left in area)
+			}, ...
+		]
+	}
+	cards: {
+		hands: [
+			[int (card id), ...], (p1 cards)
+			[int (card id), ...]  (p2 cards)
+		],
+		decks: [
+			[int (card id), ...], (p1 cards)
+			[int (card id), ...]  (p2 cards)
+		],
+		faceup: [
+			[int (card id), ...], (p1 cards)
+			[int (card id), ...]  (p2 cards)
+		]
+	}
+}

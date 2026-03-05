@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Client for shitty Toy Battles clone</title>
+	<link rel="stylesheet" href="/css/toy_battle/styles.css" />
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>
+
+</head>
+<body>
+	<div id="top">
+		<div id="yourteam">You are Player </div>
+
+		<table>
+			<tr><th></th><th class="p1bg">Player 1</th><th class="p2bg">Player 2</th></tr>
+			<tr><td class="tabletitle">Money</td><td id="p1_money" class="p1bg tablecell"></td><td id="p2_money" class="p2bg tablecell"></td></tr>
+		</table>
+	</div>
+	<div id="map"></div>
+	<div id="bottom"></div>
+
+	<script src="/js/toy_battle/main.js"></script>
+	<script src="/js/toy_battle/setup.js"></script>
+	<script src="/js/toy_battle/game_state.js"></script>
+	<script src="/js/util/httpget.js"></script>
+	<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
+
+</body>
+</html>
