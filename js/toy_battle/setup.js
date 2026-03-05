@@ -38,11 +38,6 @@ function board_init(user, resources_url)
 		}
 
 		for (var i = 0; i < res.map.areas.length; i++) {
-			var road = res.map.roads[i];
-			new L.polygon(
-				[get_base(road[0]).loc, get_base(road[1]).loc],
-				{color: 'darkorange'}
-			).addTo(map);
 		}
 
 		for (var i = 0; i < res.map.bases.length; i++) {
