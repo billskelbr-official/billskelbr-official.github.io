@@ -1,6 +1,7 @@
 var map;
 var resources;
-var areas = [];
+var areas;
+var bases;
 
 function board_init(user, resources_url)
 {
@@ -27,13 +28,18 @@ function board_init(user, resources_url)
 
 		bases = res.map.bases;
 
-		/* add the lines first so they're below the bases */
+		/* add the lines and areas first so they're below the bases */
 		for (var i = 0; i < res.map.roads.length; i++) {
 			var road = res.map.roads[i];
-			var from = get_base(road[0]).loc;
-			var to = get_base(road[1]).loc;
-
 			new L.polyline(
+				[get_base(road[0]).loc, get_base(road[1]).loc],
+				{color: 'darkorange'}
+			).addTo(map);
+		}
+
+		for (var i = 0; i < res.map.areas.length; i++) {
+			var road = res.map.roads[i];
+			new L.polygon(
 				[get_base(road[0]).loc, get_base(road[1]).loc],
 				{color: 'darkorange'}
 			).addTo(map);
