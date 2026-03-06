@@ -22,12 +22,14 @@ function main()
 	}
 
 	set_server_addr(server_addr);
+	set_player(user);
 
 	board_init(user, resources_url);
 	if (user == 1 && confirm("Click OK to start a new game\nClick Cancel to join the current game")) {
 		initialise_gamestate();
 		clear_server_state();
 		set_server_state();
+		show_current_gamestate();
 	}
-	setInterval(function() {game_loop()}, 10000);
+	setInterval(function() {game_loop()}, 7000);
 }

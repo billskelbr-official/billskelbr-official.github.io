@@ -4,96 +4,72 @@
 			"id": 0,
 			"name": "Duck",
 			"strength": 0,
-			"power": {
-				"id": 1,
-				"name": "Wildcard",
-				"desc": "Can be placed on top of any strength card"
-			},
-			"image": "",
+			"ability": 0,
+			"img": "https://www.rarebreeds.co.nz/pekinduck2.png",
+			"desc": "Can be placed on top of any strength card",
 			"count": 8
 		},
 		{
 			"id": 1,
 			"name": "Skeleton",
 			"strength": 1,
-			"power": {
-				"id": 2,
-				"name": "Reserve",
-				"desc": "Draw two more cards from the reserve"
-			},
-			"image": "",
+			"ability": 1,
+			"img": "https://www.dappercadaver.com/cdn/shop/files/male_skeleton.png",
+			"desc": "Draw two more cards from the reserve",
 			"count": 8
 		},
 		{
 			"id": 2,
-			"name": "Captain",
+			"name": "Soldier",
 			"strength": 2,
-			"power": {
-				"id": 3,
-				"name": "Company",
-				"desc": "Play one more troop this turn"
-			},
-			"image": "",
+			"ability": 2,
+			"img": "https://wiki.teamfortress.com/w/images/thumb/2/2e/Team_Captain.png/251px-Team_Captain.png",
+			"desc": "Play one more troop this turn",
 			"count": 8
 		},
 		{
 			"id": 3,
-			"name": "Robot",
+			"name": "Golem",
 			"strength": 3,
-			"power": {
-				"id": 4,
-				"name": "??",
-				"desc": "Discard one adjacent enemy"
-			},
-			"image": "",
+			"ability": 3,
+			"img": "https://www.nicepng.com/png/full/227-2272150_skin3-minecraft-iron-golem-png.png",
+			"desc": "Discard one adjacent enemy",
 			"count": 8
 		},
 		{
 			"id": 4,
 			"name": "Monkey",
 			"strength": 4,
-			"power": {
-				"id": 5,
-				"name": "Paratrooper",
-				"desc": "Can be placed on any space"
-			},
-			"image": "",
+			"ability": 4,
+			"img": "https://www.freeiconspng.com/uploads/monkey-png-8.png",
+			"desc": "Can be placed on any space",
 			"count": 8
 		},
 		{
 			"id": 5,
-			"name": "Robot #2",
+			"name": "Robot",
 			"strength": 5,
-			"power": {
-				"id": 6,
-				"name": "???",
-				"desc": "Randomly discard one troop from opponent's rack faceup"
-			},
-			"image": "",
+			"ability": 5,
+			"desc": "Randomly discard one troop from opponent's rack faceup",
+			"img": "https://purepng.com/public/uploads/large/robots-glo.png",
 			"count": 8
 		},
 		{
 			"id": 6,
 			"name": "Unicorn",
 			"strength": 6,
-			"power": {
-				"id": 7,
-				"name": "???",
-				"desc": "Draw one more card from the reserve"
-			},
-			"image": "",
+			"ability": 6,
+			"img": "https://www.freeiconspng.com/uploads/my-little-pony-rainbow-dash-17.png",
+			"desc": "Draw one more card from the reserve",
 			"count": 8
 		},
 		{
 			"id": 7,
 			"name": "Dinosaur",
 			"strength": 7,
-			"power": {
-				"id": 0,
-				"name": "Nothing",
-				"desc": "No special ability"
-			},
-			"image": "",
+			"ability": 0,
+			"img": "https://www.pngall.com/wp-content/uploads/13/Barney-PNG-Image-File.png",
+			"desc": "No special ability",
 			"count": 8
 		}
 	],

@@ -1,12 +1,28 @@
+const DEFAULTGAMESTATE = {
+	turn_number: 0,
+	turn: 1,
+	money: [0, 0],
+	board: {
+		bases: [],
+		areas: []
+	},
+	cards: {
+		hands: [[], []],
+		decks: [[], []],
+		faceup: [[], []]
+	}
+}
+
 var server_addr;
 var map;
 var cards;
 var areas;
 var bases;
 var cur_num = 0;
+var user = 0;
 
 /* see js/toy_battle/game_state.txt for details on game state */
-var game_state = null;
+var game_state = DEFAULTGAMESTATE;
 
 function board_init(user, resources_url)
 {
@@ -82,20 +98,7 @@ function board_init(user, resources_url)
 
 function initialise_gamestate()
 {
-	game_state = {
-		turn_number: 0,
-		turn: 1,
-		money: [0, 0],
-		board: {
-			bases: [],
-			areas: []
-		},
-		cards: {
-			hands: [[], []],
-			decks: [[], []],
-			faceup: [[], []]
-		}
-	};
+	game_state = DEFAULTGAMESTATE;
 
 	for (var i = 0; i < bases.length; i++) {
 		game_state.board.bases.push({id: bases[i].id, owner: 0, card: 0});
@@ -128,13 +131,32 @@ function initialise_gamestate()
 
 function show_current_gamestate()
 {
-	/* todo... */
+	document.getElementById("curturn").innerHTML = "Current turn: Player "+game_state.turn;
+	for (var i = 0; i < game_state.cards.hands[user-1].length; i++) {
+		/* draw cards to hand */
+		var card = get_card(game_state.cards.hands[user-1][i]);
+
+		var strength_txt = card.strength;
+		if (card.strength == 0) {
+			strength_txt = "WILDCARD";
+		}
+		var imgnode = document.createElement("img");
+		imgnode.src = card.img;
+		imgnode.width = 200;
+		imgnode.height = 150;
+		document.getElementById("c"+i+"n").innerText = card.name + "("+strength_txt+")";
+		document.getElementById("c"+i+"i").textContent = "";
+		document.getElementById("c"+i+"i").appendChild(imgnode);
+		document.getElementById("c"+i+"p").innerText = card.desc;
+	}
 }
 
 function game_loop()
 {
-	get_server_state();
-	show_current_gamestate();
+	/* pause checking when it's our turn */
+	if (game_state.turn != user && get_server_state() == 1) {
+		show_current_gamestate();
+	}
 }
 
 function clear_server_state()
@@ -209,4 +231,19 @@ function get_base(id)
 		}
 	}
 	return null;
+}
+
+function get_card(id)
+{
+	for (var i = 0; i < cards.length; i++) {
+		if (cards[i].id == id) {
+			return cards[i];
+		}
+	}
+	return null;
+}
+
+function set_player(u)
+{
+	user = u;
 }

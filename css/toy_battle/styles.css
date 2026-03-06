@@ -1,13 +1,19 @@
+#mainarea {
+	height: 99vh;
+}
+
 #top {
+	background-color: gray;
 	height: 10vh;
 }
 
 #map {
-	height: 70vh;
+	height: 60vh;
 }
 
 #bottom {
-	height: 20vh;
+	background-color: RGBA(64, 64, 64, 0.8);
+	height: 30vh;
 }
 
 .tabletitle {
@@ -27,9 +33,8 @@
 	color: white;
 }
 
-#yourteam {
+.ctrdisplay {
 	text-align: center;
-	height: 2vw;
 }
 
 #cardhand>tbody>tr>*, #cardhand>tbody>tr, #cardhand>tbody {
@@ -37,6 +42,6 @@
 }
 
 #cardhand>tbody>tr>* {
-	height: 4vh;
+	height: 1vw;
 	width: 12vw;
 }
