@@ -1,0 +1,262 @@
+{
+	"cards": [
+		{
+			"id": 0,
+			"name": "Duck",
+			"strength": 0,
+			"power": {
+				"id": 1,
+				"name": "Wildcard",
+				"desc": "Can be placed on top of any strength card"
+			},
+			"image": "",
+			"count": 8
+		},
+		{
+			"id": 1,
+			"name": "Skeleton",
+			"strength": 1,
+			"power": {
+				"id": 2,
+				"name": "Reserve",
+				"desc": "Draw two more cards from the reserve"
+			},
+			"image": "",
+			"count": 8
+		},
+		{
+			"id": 2,
+			"name": "Captain",
+			"strength": 2,
+			"power": {
+				"id": 3,
+				"name": "Company",
+				"desc": "Play one more troop this turn"
+			},
+			"image": "",
+			"count": 8
+		},
+		{
+			"id": 3,
+			"name": "Robot",
+			"strength": 3,
+			"power": {
+				"id": 4,
+				"name": "??",
+				"desc": "Discard one adjacent enemy"
+			},
+			"image": "",
+			"count": 8
+		},
+		{
+			"id": 4,
+			"name": "Monkey",
+			"strength": 4,
+			"power": {
+				"id": 5,
+				"name": "Paratrooper",
+				"desc": "Can be placed on any space"
+			},
+			"image": "",
+			"count": 8
+		},
+		{
+			"id": 5,
+			"name": "Robot #2",
+			"strength": 5,
+			"power": {
+				"id": 6,
+				"name": "???",
+				"desc": "Randomly discard one troop from opponent's rack faceup"
+			},
+			"image": "",
+			"count": 8
+		},
+		{
+			"id": 6,
+			"name": "Unicorn",
+			"strength": 6,
+			"power": {
+				"id": 7,
+				"name": "???",
+				"desc": "Draw one more card from the reserve"
+			},
+			"image": "",
+			"count": 8
+		},
+		{
+			"id": 7,
+			"name": "Dinosaur",
+			"strength": 7,
+			"power": {
+				"id": 0,
+				"name": "Nothing",
+				"desc": "No special ability"
+			},
+			"image": "",
+			"count": 8
+		}
+	],
+
+	"map": {
+		"center": [
+			22.295666324302115,
+			114.19572907698004
+		],
+		"bases": [
+			{
+				"id": 1,
+				"loc": [22.24890534759212, 114.17893409729005],
+				"base": 1
+			},
+			{
+				"id": 2,
+				"loc": [22.25073246486407, 114.13636207580568],
+				"base": 0
+			},
+			{
+				"id": 3,
+				"loc": [22.239928294794364, 114.2223644256592],
+				"base": 0
+			},
+			{
+				"id": 4,
+				"loc": [22.263188436428475, 114.14829254150392],
+				"base": 0
+			},
+			{
+				"id": 5,
+				"loc": [22.2557276795557, 114.22914505004884],
+				"base": 0
+			},
+			{
+				"id": 6,
+				"loc": [22.274934353970007, 114.12992477416994],
+				"base": 0
+			},
+			{
+				"id": 7,
+				"loc": [22.276362844246947, 114.23910140991212],
+				"base": 0
+			},
+			{
+				"id": 8,
+				"loc": [22.295407986881507, 114.1508674621582],
+				"base": 0
+			},
+			{
+				"id": 9,
+				"loc": [22.29112305601527, 114.18210983276369],
+				"base": 0
+			},
+			{
+				"id": 10,
+				"loc": [22.294614491078036, 114.22348022460938],
+				"base": 0
+			},
+			{
+				"id": 11,
+				"loc": [22.31556126918944, 114.17352676391603],
+				"base": 0
+			},
+			{
+				"id": 12,
+				"loc": [22.325398822810573, 114.19773101806642],
+				"base": 0
+			},
+			{
+				"id": 13,
+				"loc": [22.32032146237116, 114.13267135620119],
+				"base": 0
+			},
+			{
+				"id": 14,
+				"loc": [22.31841740457981, 114.26330566406251],
+				"base": 0
+			},
+			{
+				"id":15,
+				"loc": [22.37227888892882, 114.11155700683595],
+				"base": 0
+			},
+			{
+				"id": 16,
+				"loc": [22.385918789118502, 114.27223205566408],
+				"base": 0
+			},
+			{
+				"id": 17,
+				"loc": [22.370375540759195, 114.18399810791017],
+				"base": 2
+			}
+		],
+		"roads": [
+			[1, 2],
+			[1, 3],
+			[2, 4],
+			[3, 5],
+			[4, 6],
+			[4, 8],
+			[4, 9],
+			[5, 7],
+			[5, 9],
+			[5, 10],
+			[6, 8],
+			[7, 10],
+			[8, 11],
+			[8, 13],
+			[9, 11],
+			[9, 12],
+			[10, 12],
+			[10, 14],
+			[11, 13],
+			[11, 15],
+			[12, 14],
+			[12, 16],
+			[15, 17],
+			[16, 17]
+		],
+		"areas": [
+			{
+				"id": 1,
+				"border": [1, 2, 4, 9, 5, 3],
+				"cash": 3
+			},
+			{
+				"id": 2,
+				"border": [4, 6, 8],
+				"cash": 1
+			},
+			{
+				"id": 3,
+				"border": [5, 7, 10],
+				"cash": 1
+			},
+			{
+				"id": 4,
+				"border": [4, 8, 11, 9],
+				"cash": 2
+			},
+			{
+				"id": 5,
+				"border": [5, 9, 12, 10],
+				"cash": 2
+			},
+			{
+				"id": 6,
+				"border": [8, 11, 13],
+				"cash": 1
+			},
+			{
+				"id": 7,
+				"border": [10, 12, 14],
+				"cash": 1
+			},
+			{
+				"id": 8,
+				"border": [9, 11, 15, 17, 16, 12],
+				"cash": 3
+			}
+		]
+	}
+}

@@ -2,43 +2,34 @@ window.onload = main;
 
 function main()
 {
-	var resources_url = ""
-	var server_addr = "";
-	var user = 0;
+	var settings;
+	var resources_url;
+	var server_addr;
+	var user;
 
-	while (true) {
-		resources_url = prompt("Enter resource pack URL...");
-		if (confirm("Confirm resource pack:\n"+resources_url)) {
-			break;
-		}
+	if (document.referrer.search("setup.html") == -1) {
+		window.location.href = "setup.html";
 	}
 
-	while (true) {
-		server_addr = prompt("Enter server address...");
-		if (confirm("Confirm server address:\n"+server_addr)) {
-			break;
-		}
+	try {
+		settings = JSON.parse(atob((new URL(window.location)).searchParams.get("settings")));
+		resources_url = settings.resource;
+		server_addr = settings.server;
+		user = settings.player;
+	} catch (e) {
+		alert("fatal error: "+e+"\n");
+		window.location.href = "setup.html";
 	}
 
-	while (true) {
-		while (true) {
-			user = prompt("Select player (1 or 2)");
-			user = Number(user);
-			if (user == 1 || user == 2) {
-				break;
-			}
-			alert("Player must be 1 or 2");
-		}
-		if (confirm("Confirm playing as Player " + user)) {
-			break;
-		}
-	}
+	set_server_addr(server_addr);
 
 	board_init(user, resources_url);
-	if (user == 1 && confirm("Do you want to re-initialise the game?")) {
-		setup_board();
-		update_server();
+	if (user == 1 && confirm("Click OK to start a new game\nClick Cancel to join the current game")) {
+		initialise_gamestate();
+		set_server_state();
+	} else {
+		get_server_state();
 	}
 
-	setInterval(function() {game_loop(server_addr, user)}, 5000);
+	setInterval(function() {game_loop()}, 10000);
 }

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>setup</title>
+	<style>
+		input[type="text"] {
+			width: 20vw;
+		}
+	</style>
+</head>
+<body>
+	<form>
+		<label for="resource">Resource File</label><br />
+			<input type="radio" id="res_opt1" name="resource" value="/toy_battle/resources/vanilla.json" checked="checked">
+			<label for="res_opt1">Example (Vanilla)</label>
+			<br />
+
+			<input type="radio" id="res_cus" name="resource" value="custom">
+			<label for="res_cus">Custom...<input type="text" id="customresource" /></label>
+			<br />
+		<br />
+
+		<label for="server">Server Address</label><br />
+<!--
+		<input id="serverinput" type="text" name="server" value="http://bilskelbr.atwebpages.com/toy_battle"/><br />
+-->
+		<input id="serverinput" type="text" name="server" value="http://localhost:8081"/><br />
+		<br />
+
+		<label for="player">Play as</label><br />
+			<input type="radio" id="p1" name="player" value="1" checked="checked">
+			<label for="p1">Player 1</label>
+			<br />
+
+			<input type="radio" id="p2" name="player" value="2">
+			<label for="p2">Player 2</label>
+			<br />
+		<br />
+	</form>
+	<button onclick="startgame()">start game!</button>
+	<script src="/js/toy_battle/setup.js"></script>
+</body>
+</html>

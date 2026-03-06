@@ -31,3 +31,12 @@
 	text-align: center;
 	height: 2vw;
 }
+
+#cardhand>tbody>tr>*, #cardhand>tbody>tr, #cardhand>tbody {
+	border: 1px solid black;
+}
+
+#cardhand>tbody>tr>* {
+	height: 4vh;
+	width: 12vw;
+}
