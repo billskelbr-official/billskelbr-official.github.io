@@ -3,6 +3,7 @@ var map;
 var cards;
 var areas;
 var bases;
+var cur_num = 0;
 
 /* see js/toy_battle/game_state.txt for details on game state */
 var game_state = null;
@@ -136,10 +137,20 @@ function game_loop()
 	show_current_gamestate();
 }
 
+function clear_server_state()
+{
+	internal_write_server_state("");
+}
+
 function set_server_state()
 {
+	internal_write_server_state(btoa(JSON.stringify(game_state)));
+}
+
+function internal_write_server_state(payload)
+{
 	try {
-		var dest = server_addr + "/write_state.php?state=" + btoa(JSON.stringify(game_state));
+		var dest = server_addr + "/write_state.php?state=" + payload;
 		var resp = http_get_json(dest);
 		if (resp.status != 0) {
 			alert(resp.body);
@@ -150,20 +161,39 @@ function set_server_state()
 	}
 }
 
+/* returns -1 on error, 0 on no action needed, 1 if new info received */
 function get_server_state()
 {
+	var server_num;
+	try {
+		var dest = server_addr + "/get_num.php";
+		var resp = http_get_json(dest);
+		if (resp.status != 0) {
+			alert(resp.body);
+			return -1;
+		}
+		server_num = resp.body;
+	} catch (e) {
+		alert("could not get game state from server\n" + e);
+	}
+
+	if (cur_num >= server_num) {
+		return 0;
+	}
+
 	try {
 		var dest = server_addr + "/get_state.php";
 		var resp = http_get_json(dest);
 		if (resp.status != 0) {
 			alert(resp.body);
-			return 1;
+			return -1;
 		}
 		game_state = JSON.parse(atob(resp.body));
-		return 0;
 	} catch (e) {
 		alert("could not get game state from server\n" + e);
 	}
+	cur_num = server_num;
+	return 1;
 }
 
 function set_server_addr(addr)

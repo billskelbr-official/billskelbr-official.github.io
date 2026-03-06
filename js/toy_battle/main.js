@@ -26,10 +26,8 @@ function main()
 	board_init(user, resources_url);
 	if (user == 1 && confirm("Click OK to start a new game\nClick Cancel to join the current game")) {
 		initialise_gamestate();
+		clear_server_state();
 		set_server_state();
-	} else {
-		get_server_state();
 	}
-
 	setInterval(function() {game_loop()}, 10000);
 }
