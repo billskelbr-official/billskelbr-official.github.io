@@ -404,7 +404,7 @@ function clickhandler_base(id)
 			popupcontent += "</p>";
 		}
 	} else {
-		popupcontent = "<p>cards here (top to bottom):</p>";
+		popupcontent += "<p>cards here (top to bottom):</p>";
 		for (var i = gsbase.cards.length-1; i >= 0 ; i--) {
 			var gscard = gsbase.cards[i];
 			var card = get_card(gscard[1]);
