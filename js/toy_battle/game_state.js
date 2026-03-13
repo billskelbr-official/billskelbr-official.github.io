@@ -567,15 +567,19 @@ function next_round()
 	for (var i = 0; i < areas.length; i++) {
 		var a = areas[i];
 		var bord = a.border;
-		var base = get_gs_base(bord[0]);
-		if (base.cards.length == 0) {
+		var gsbase = get_gs_base(bord[0]);
+		var base = get_base(bord[0]);
+		if (gsbase.cards.length == 0 && base.base == 0) {
 			continue;
 		}
-		var owner = base.cards[base.cards.length-1][0];
+		var owner = base.base;
+		if (owner == 0) {
+			owner = gsbase.cards[gsbase.cards.length-1][0];
+		}
 		var owned = 1;
 		for (var j = 1; j < bord.length; j++) {
 			var bs = get_gs_base(bord[j]);
-			if (bs.cards.length == 0 || bs.cards[bs.cards.length-1][0] != user) {
+			if ((bs.cards.length == 0 || bs.cards[bs.cards.length-1][0] != owner) && get_base(bord[j]).base != owner) {
 				owned = 0;
 				break;
 			}
