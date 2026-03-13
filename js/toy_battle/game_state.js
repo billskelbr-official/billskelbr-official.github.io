@@ -572,7 +572,7 @@ function clickhandler_rightclick_base(id)
 		for (var i = 0; i < nb.length; i++) {
 			var g = get_gs_base(nb[i]);
 			if (g.cards.length > 0 && g.cards[g.cards.length-1][0] != user) {
-				targets.push(g);
+				targets.push(g.id);
 				str += "" + nb[i] + "\n";
 			}
 		}
@@ -586,7 +586,7 @@ function clickhandler_rightclick_base(id)
 			} else {
 				var ok = 0;
 				do {
-					tgt = prompt();
+					tgt = prompt(str);
 					for (var i = 0; i < targets.length; i++) {
 						if (targets[i] == tgt) {
 							ok = 1;
