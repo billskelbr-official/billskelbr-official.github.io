@@ -1,7 +1,7 @@
 const DEFAULTGAMESTATE = {
 	win: 0,
 	turn_number: 0,
-	turn: 1,
+	turn: 0,
 	money: [0, 0],
 	board: {
 		bases: [],
@@ -38,9 +38,7 @@ function board_init(user, resources_url)
 	var team_banner = document.getElementById("yourteam");
 
 	team_banner.innerHTML = "You are Player " + user;
-	if (user == 1) {
-		team_banner.class
-	}
+	team_banner.classList.add("p"+user+"bg");
 
 	res = http_get_json(resources_url);
 	if (res == null) {
@@ -130,6 +128,7 @@ function board_init(user, resources_url)
 function initialise_gamestate()
 {
 	game_state = DEFAULTGAMESTATE;
+	game_state.turn = 1;
 
 	for (var i = 0; i < bases.length; i++) {
 		game_state.board.bases.push({id: bases[i].id, cards: []});
@@ -144,7 +143,7 @@ function initialise_gamestate()
 			game_state.cards.decks[1].push(cards[i].id);
 		}
 	}
-alert("todo: ban cards")
+
 	for (var i = 0; i < 4; i++) {
 		game_state.cards.decks[0].splice(randint(game_state.cards.decks[0].length), 1);
 		game_state.cards.decks[1].splice(randint(game_state.cards.decks[1].length), 1);
@@ -183,7 +182,10 @@ function show_current_gamestate()
 	}
 
 	/* current game turn */
-	show_current_turn();
+	document.getElementById("curturn").innerHTML = "Current turn: Player "+game_state.turn;
+	document.getElementById("curturn").classList.add("p"+game_state.turn+"bg");
+
+	document.getElementById("enemyhand").innerText = "Enemy has "+game_state.cards.hands[(!(user-1))+0].length+" cards";
 
 	/* money */
 	document.getElementById("p1_money").innerHTML = game_state.money[0];
@@ -192,6 +194,7 @@ function show_current_gamestate()
 	/* reset selected card because the buttons are deselected */
 	selected_card = null;
 	/* draw cards to hand */
+	clear_cards_in_hand();
 	show_cards_in_hand();
 
 	/* players money */
@@ -268,11 +271,6 @@ function show_cards_in_hand()
 		document.getElementById("c"+i+"b").onclick = Function("cardselect(" + i + ");");
 		document.getElementById("c"+i+"b").disabled = false;
 	}
-}
-
-function show_current_turn()
-{
-	document.getElementById("curturn").innerHTML = "Current turn: Player "+game_state.turn;
 }
 
 function game_loop()
@@ -384,24 +382,42 @@ function set_player(u)
 
 function clickhandler_base(id)
 {
-console.log(id);
 	var base = get_base(id);
 	var gsbase = get_gs_base(id);
-	var popupcontent = "<p>cards here (top to bottom):</p>";
-	for (var i = gsbase.cards.length-1; i >= 0 ; i--) {
-		var gscard = gsbase.cards[i];
-		var card = get_card(gscard[1]);
-		popupcontent += "<p class=\"p"+gscard[0]+"bg\">";
-		popupcontent += "(Player " + gscard[0] + ") ";
-		popupcontent += card.name + " ";
-		popupcontent += "("+card.strength+")</p>";
+	var popupcontent;
+	if (base.base == user) {
+		popupcontent = "<p class=\"p1bg\">Player 1 discarded faceup:</p>";
+		for (var i = 0; i < game_state.cards.faceup[0].length; i++) {
+			var card = get_card(game_state.cards.faceup[0][i]);
+			popupcontent += "<p class=\"p1bg\">";
+			popupcontent += card.name;
+			popupcontent += " (" + card.strength + ")";
+			popupcontent += "</p>";
+		}
+		popupcontent += "<p class=\"p2bg\">Player 2 discarded faceup:</p>";
+		for (var i = 0; i < game_state.cards.faceup[1].length; i++) {
+			var card = get_card(game_state.cards.faceup[1][i]);
+			popupcontent += "<p class=\"p2bg\">";
+			popupcontent += card.name;
+			popupcontent += " (" + card.strength + ")";
+			popupcontent += "</p>";
+		}
+	} else {
+		popupcontent = "<p>cards here (top to bottom):</p>";
+		for (var i = gsbase.cards.length-1; i >= 0 ; i--) {
+			var gscard = gsbase.cards[i];
+			var card = get_card(gscard[1]);
+			popupcontent += "<p class=\"p"+gscard[0]+"bg\">";
+			popupcontent += "(Player " + gscard[0] + ") ";
+			popupcontent += card.name + " ";
+			popupcontent += "("+card.strength+")</p>";
+		}
 	}
-
 	L.popup()
 		.setLatLng(base.loc)
-  		.setContent(popupcontent)
-  		.addTo(map)
-  		.openOn(map);
+		.setContent(popupcontent)
+		.addTo(map)
+		.openOn(map);
 }
 
 function clickhandler_rightclick_base(id)
@@ -544,8 +560,18 @@ function clickhandler_rightclick_base(id)
 		return;
 
 	case 3: /* discard surrounding */
-	case 5: /* discard from opponent hand */
 		alert("ability id "+played_card.ability+" not implemented");
+		next_round();
+		return;
+	case 5: /* discard from opponent hand */
+		var enemy = 1+!(user-1);
+		if (game_state.cards.hands[enemy-1].length == 0) {
+			alert("Enemy has no cards to discard!");
+		} else {
+			var discard_ind = randint(game_state.cards.hands[enemy-1].length);
+			game_state.cards.faceup[enemy-1].push(game_state.cards.hands[enemy-1][discard_ind]);
+			game_state.cards.hands[enemy-1].splice(discard_ind, 1);
+		}
 		next_round();
 		return;
 	}
@@ -591,7 +617,7 @@ function next_round()
 	for (var i = captured.length-1; i >= 0; i--) {
 		var area = areas[captured[i][1]];
 		var owner = captured[i][0];
-		game_state.money[owner] += area.cash;
+		game_state.money[owner-1] += area.cash;
 		area.polygon.removeFrom(map);
 	}
 

@@ -14,7 +14,7 @@
 			"ability": 0,
 			"img": "https://www.rarebreeds.co.nz/pekinduck2.png",
 			"desc": "Can be placed on top of any strength card",
-			"count": 8
+			"count": 3
 		},
 		{
 			"id": 1,
@@ -23,7 +23,7 @@
 			"ability": 1,
 			"img": "https://www.dappercadaver.com/cdn/shop/files/male_skeleton.png",
 			"desc": "Draw two more cards from the reserve",
-			"count": 8
+			"count": 3
 		},
 		{
 			"id": 2,
@@ -32,7 +32,7 @@
 			"ability": 2,
 			"img": "https://wiki.teamfortress.com/w/images/thumb/2/2e/Team_Captain.png/251px-Team_Captain.png",
 			"desc": "Play one more troop this turn",
-			"count": 8
+			"count": 3
 		},
 		{
 			"id": 3,
@@ -41,7 +41,7 @@
 			"ability": 3,
 			"img": "https://www.nicepng.com/png/full/227-2272150_skin3-minecraft-iron-golem-png.png",
 			"desc": "<TODO / NOT IMPLEMENTED> Discard one adjacent enemy",
-			"count": 8
+			"count": 3
 		},
 		{
 			"id": 4,
@@ -50,7 +50,7 @@
 			"ability": 4,
 			"img": "https://www.freeiconspng.com/uploads/monkey-png-8.png",
 			"desc": "Can be placed on any space",
-			"count": 8
+			"count": 3
 		},
 		{
 			"id": 5,
@@ -58,8 +58,8 @@
 			"strength": 5,
 			"ability": 5,
 			"img": "https://purepng.com/public/uploads/large/robots-glo.png",
-			"desc": "<TODO / NOT IMPLEMENTED> Randomly discard one troop from opponent's rack faceup",
-			"count": 8
+			"desc": "Randomly discard one troop from opponent's rack faceup",
+			"count": 3
 		},
 		{
 			"id": 6,
@@ -68,7 +68,7 @@
 			"ability": 6,
 			"img": "https://www.freeiconspng.com/uploads/my-little-pony-rainbow-dash-17.png",
 			"desc": "Draw one more card from the reserve",
-			"count": 8
+			"count": 3
 		},
 		{
 			"id": 7,
@@ -77,7 +77,7 @@
 			"ability": 0,
 			"img": "https://www.pngall.com/wp-content/uploads/13/Barney-PNG-Image-File.png",
 			"desc": "No special ability",
-			"count": 8
+			"count": 3
 		}
 	],
 
