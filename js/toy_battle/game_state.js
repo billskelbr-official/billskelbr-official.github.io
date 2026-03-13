@@ -551,7 +551,7 @@ function next_round()
 			captured.push([owner, i]);
 		}
 	}
-	for (var i = captured.length; i >= 0; i--) {
+	for (var i = captured.length-1; i >= 0; i--) {
 		var area = areas[captured[i][1]];
 		var owner = captured[i][0];
 		game_state.money[owner] += area.cash;
