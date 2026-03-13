@@ -22,10 +22,6 @@ var bases;
 var cur_num = 0;
 var user = 0;
 var selected_card = null;
-var maplabels = {
-	areas: [],
-	bases: []
-};
 var links;
 var winmoney;
 
@@ -95,7 +91,7 @@ function board_init(user, resources_url)
 
 		for (var i = 0; i < bases.length; i++) {
 			var base = bases[i];
-			var base_circle = L.circle(base.loc, {radius: 256, color: "darkorange"}).addTo(map);
+			var base_circle = L.circle(base.loc, {radius: 360, color: "darkorange"}).addTo(map);
 
 			switch (base.base) {
 			case 1: /* team 1 base */
@@ -183,6 +179,8 @@ function show_current_gamestate()
 
 	/* current game turn */
 	document.getElementById("curturn").innerHTML = "Current turn: Player "+game_state.turn;
+
+	document.getElementById("curturn").classList.remove("p"+((!(game_state.turn-1))+0)+"bg");
 	document.getElementById("curturn").classList.add("p"+game_state.turn+"bg");
 
 	document.getElementById("enemyhand").innerText = "Enemy has "+game_state.cards.hands[(!(user-1))+0].length+" cards";
@@ -202,10 +200,6 @@ function show_current_gamestate()
 	document.getElementById("p2_money").innerText = game_state.money[1];
 
 	/* map stuff - cash in areas */
-	for (var i = 0; i < maplabels.areas.length; i++) {
-		maplabels.areas[i].removeFrom(map);
-	}
-	maplabels.areas = [];
 	for (var i = 0; i < game_state.board.areas.length; i++) {
 		var areastate = game_state.board.areas[i];
 
@@ -363,6 +357,11 @@ function get_area(id)
 function get_gs_base(id)
 {
 	return internal_id_search(game_state.board.bases, id);
+}
+
+function get_gs_area(id)
+{
+	return internal_id_search(game_state.board.areas, id);
 }
 
 function internal_id_search(arr, id)
@@ -590,14 +589,19 @@ function next_round()
 {
 	/* check for capture of areas */
 	var captured = [];
-	for (var i = 0; i < areas.length; i++) {
-		var a = areas[i];
+	for (var i = 0; i < game_state.areas.length; i++) {
+		var a = get_area(game_state.areas[i]);
 		var bord = a.border;
 		var gsbase = get_gs_base(bord[0]);
 		var base = get_base(bord[0]);
 		if (gsbase.cards.length == 0 && base.base == 0) {
 			continue;
 		}
+
+		if (game_state.areas[i].cash == 0) {
+			continue;
+		}
+
 		var owner = base.base;
 		if (owner == 0) {
 			owner = gsbase.cards[gsbase.cards.length-1][0];
@@ -611,13 +615,14 @@ function next_round()
 			}
 		}
 		if (owned) {
-			captured.push([owner, i]);
+			captured.push([owner, a.id]);
 		}
 	}
 	for (var i = captured.length-1; i >= 0; i--) {
 		var area = areas[captured[i][1]];
 		var owner = captured[i][0];
 		game_state.money[owner-1] += area.cash;
+		get_gs_area(captured[i][1]).cash = 0;
 		area.polygon.removeFrom(map);
 	}
 
