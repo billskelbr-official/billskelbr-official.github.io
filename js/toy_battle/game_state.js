@@ -701,9 +701,9 @@ function next_round()
 
 	game_state.turn_number++;
 
-	/* update current gamestate first before we update the server */
-	show_current_gamestate();
-
 	/* update the server */
 	set_server_state();
+
+	/* update current gamestate after we update the server, because this redirects away after a win */
+	show_current_gamestate();
 }
