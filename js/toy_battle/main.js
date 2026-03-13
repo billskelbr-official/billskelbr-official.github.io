@@ -25,7 +25,7 @@ function main()
 	set_player(user);
 
 	board_init(user, resources_url);
-	if (user == 1 && confirm("Click OK to start a new game\nClick Cancel to join the current game")) {
+	if (user == 1 && !confirm("Click cancel to start a new game\nClick OK to join the current game")) {
 		initialise_gamestate();
 		clear_server_state();
 		set_server_state();
