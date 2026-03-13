@@ -589,8 +589,8 @@ function next_round()
 {
 	/* check for capture of areas */
 	var captured = [];
-	for (var i = 0; i < game_state.areas.length; i++) {
-		var a = get_area(game_state.areas[i]);
+	for (var i = 0; i < game_state.board.areas.length; i++) {
+		var a = get_area(game_state.board.areas[i]);
 		var bord = a.border;
 		var gsbase = get_gs_base(bord[0]);
 		var base = get_base(bord[0]);
@@ -598,7 +598,7 @@ function next_round()
 			continue;
 		}
 
-		if (game_state.areas[i].cash == 0) {
+		if (game_state.board.areas[i].cash == 0) {
 			continue;
 		}
 
