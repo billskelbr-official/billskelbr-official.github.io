@@ -1,6 +1,5 @@
 const DEFAULTGAMESTATE = {
 	win: 0,
-	turn_number: 0,
 	turn: 0,
 	money: [0, 0],
 	board: {
@@ -698,8 +697,6 @@ function next_round()
 	} else {
 		game_state.turn = 1;
 	}
-
-	game_state.turn_number++;
 
 	/* update the server */
 	set_server_state();
