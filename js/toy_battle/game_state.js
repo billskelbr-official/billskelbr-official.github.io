@@ -158,6 +158,8 @@ function initialise_gamestate()
 
 function show_current_gamestate()
 {
+	map.closePopup();
+
 	/* win? */
 	if (game_state.win != 0) {
 		var dest;
@@ -180,7 +182,7 @@ function show_current_gamestate()
 	/* current game turn */
 	document.getElementById("curturn").innerHTML = "Current turn: Player "+game_state.turn;
 
-	document.getElementById("curturn").classList.remove("p"+((!(game_state.turn-1))+0)+"bg");
+	document.getElementById("curturn").classList.remove("p"+((!(game_state.turn-1))+1)+"bg");
 	document.getElementById("curturn").classList.add("p"+game_state.turn+"bg");
 
 	document.getElementById("enemyhand").innerText = "Enemy has "+game_state.cards.hands[(!(user-1))+0].length+" cards";
@@ -448,7 +450,6 @@ function clickhandler_rightclick_base(id)
 		alert("no card selected!");
 		return;
 	}
-	map.closePopup();
 
 	/* cannot place on own base */
 	var base = get_base(id);
@@ -478,6 +479,8 @@ function clickhandler_rightclick_base(id)
 
 	/* handle connection to base requirements */
 	var base = get_base(id);
+	map.closePopup();
+
 
 	var connected2base = 0;
 	if (played_card.ability != 4 || base.base != 0) { /* ability 4 can airdrop anywhere except if placing on enemy base*/
@@ -556,6 +559,11 @@ function clickhandler_rightclick_base(id)
 		return;
 
 	case 2: /* play another turn */
+		if (game_state.cards.hands[user-1].length == 0) {
+			alert("you don't have a card to play again!");
+			next_round();
+			return;
+		}
 		return;
 
 	case 3: /* discard surrounding */
@@ -619,10 +627,11 @@ function next_round()
 		}
 	}
 	for (var i = captured.length-1; i >= 0; i--) {
-		var area = areas[captured[i][1]];
+		var gsarea = get_gs_area(captured[i][1]);
 		var owner = captured[i][0];
-		game_state.money[owner-1] += area.cash;
-		get_gs_area(captured[i][1]).cash = 0;
+		var area = get_area(gsarea.id);
+		game_state.money[owner-1] += gsarea.cash;
+		gsarea.cash = 0;
 		area.polygon.removeFrom(map);
 	}
 
