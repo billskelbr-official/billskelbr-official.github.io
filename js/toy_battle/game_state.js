@@ -1,4 +1,5 @@
 const DEFAULTGAMESTATE = {
+	win: 0,
 	turn_number: 0,
 	turn: 1,
 	money: [0, 0],
@@ -20,6 +21,13 @@ var areas;
 var bases;
 var cur_num = 0;
 var user = 0;
+var selected_card = null;
+var maplabels = {
+	areas: [],
+	bases: []
+};
+var links;
+var winmoney;
 
 /* see js/toy_battle/game_state.txt for details on game state */
 var game_state = DEFAULTGAMESTATE;
@@ -43,17 +51,31 @@ function board_init(user, resources_url)
 	try {
 		cards = res.cards;
 
-		map = L.map('map').setView(res.map.center, 13);
-
+		map = L.map("map").setView(res.map.center, 13);
+		map.setMaxBounds([
+			[res.map.center[0]-0.2, res.map.center[1]-0.05],
+			[res.map.center[0]+0.2, res.map.center[1]+0.05]
+		]);
+		map.setMinZoom(12);
+		map.setMaxZoom(15);
+/*
 		L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 			attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 		}).addTo(map);
+*/
+		winmoney = res.rules.winmoney;
+		document.getElementById("moneytitle").innerText = "Money ($" + winmoney + " to win)";
 
 		bases = res.map.bases;
+		for (var i = 0; i < bases.length; i++) {
+			bases[i].neighbours = [];
+		}
 
 		/* add the lines and areas first so they're below the bases */
 		for (var i = 0; i < res.map.roads.length; i++) {
 			var road = res.map.roads[i];
+			get_base(road[0]).neighbours.push(road[1]);
+			get_base(road[1]).neighbours.push(road[0]);
 			new L.polyline(
 				[get_base(road[0]).loc, get_base(road[1]).loc],
 				{color: 'darkorange'}
@@ -73,23 +95,32 @@ function board_init(user, resources_url)
 			).addTo(map);
 		}
 
-		for (var i = 0; i < res.map.bases.length; i++) {
-			var base = res.map.bases[i];
-			var circle_colour;
+		for (var i = 0; i < bases.length; i++) {
+			var base = bases[i];
+			var base_circle = L.circle(base.loc, {radius: 256, color: "darkorange"}).addTo(map);
+
 			switch (base.base) {
-			case 1:
-				circle_colour = "maroon";
+			case 1: /* team 1 base */
+				base.circle = L.rectangle(base_circle.getBounds(), {color: "maroon"}).addTo(map);
+				base_circle.removeFrom(map);
 				break;
 			case 2:
-				circle_colour = "navy";
+				base.circle = L.rectangle(base_circle.getBounds(), {color: "navy"}).addTo(map);
+				base_circle.removeFrom(map);
 				break;
 			case 0:
 			default:
-				circle_colour = "darkorange";
+				base.circle = base_circle;
 				break;
 			}
-			base.circle = L.circle(base.loc, {radius: 256, color: circle_colour}).addTo(map);
+			/* click to show list of cards played, rightclick to play card */
+			/* i cant figure out how to implement this function thingy and so ain't much help either, so i came up with this. terry would NOT consider this Divine Intellect. */
+			base.circle.on("click", Function("clickhandler_base(" + base.id + ")"));
+			base.circle.on("contextmenu", Function("clickhandler_rightclick_base(" + base.id + ")"));
+			base.circle.addTo(map);
 		}
+
+		links = res.redirects;
 	} catch (e) {
 		alert("fatal error: " + e + "\nreload page now");
 		window.location.reload();
@@ -101,10 +132,10 @@ function initialise_gamestate()
 	game_state = DEFAULTGAMESTATE;
 
 	for (var i = 0; i < bases.length; i++) {
-		game_state.board.bases.push({id: bases[i].id, owner: 0, card: 0});
+		game_state.board.bases.push({id: bases[i].id, cards: []});
 	}
 	for (var i = 0; i < areas.length; i++) {
-		game_state.board.areas.push({id: areas[i].id, cash: areas[0].cash});
+		game_state.board.areas.push({id: areas[i].id, cash: areas[i].cash});
 	}
 
 	for (var i = 0; i < cards.length; i++) {
@@ -131,9 +162,86 @@ function initialise_gamestate()
 
 function show_current_gamestate()
 {
-	document.getElementById("curturn").innerHTML = "Current turn: Player "+game_state.turn;
+	/* win? */
+	if (game_state.win != 0) {
+		var dest;
+		if (game_state.win == user) {
+			dest = links.win;
+		} else {
+			dest = links.lose;
+		}
+		if (!dest) {
+			if (game_state.win == user) {
+				alert("you win!");
+			} else {
+				alert("you lose!");
+			}
+			dest = "http://bilskelbr.atwebpages.com/toy_battle";
+		}
+		window.location.href = dest;
+	}
+
+	/* current game turn */
+	show_current_turn();
+
+	/* draw cards to hand */
+	show_cards_in_hand();
+
+	/* players money */
+	document.getElementById("p1_money").innerText = game_state.money[0];
+	document.getElementById("p2_money").innerText = game_state.money[1];
+
+	/* map stuff - cash in areas */
+	for (var i = 0; i < maplabels.areas.length; i++) {
+		maplabels.areas[i].removeFrom(map);
+	}
+	maplabels.areas = [];
+	for (var i = 0; i < game_state.board.areas.length; i++) {
+		var areastate = game_state.board.areas[i];
+
+		if (areastate.cash == 0) {
+			continue;
+		}
+		var area = get_area(areastate.id);
+		area.polygon.bindTooltip("$"+areastate.cash, {permanent: true, direction:"center"});
+	}
+
+	/* maps stuff - units on bases */
+
+}
+
+function clear_cards_in_hand()
+{
+	for (var i = 0; i < 8; i++) {
+		document.getElementById("c"+i+"n").innerText = "";
+		document.getElementById("c"+i+"i").innerText = "";
+		document.getElementById("c"+i+"p").innerText = "";
+		document.getElementById("c"+i+"b").disabled = true;
+	}
+}
+
+function update_map_colours()
+{
+	for (var i = 0; i < bases.length; i++) {
+		var b = bases[i];
+		var gsb = get_gs_base(b.id);
+
+		if (b.base != 0) {
+			continue;
+		}
+		if (gsb.cards.length == 0) {
+			b.circle.setStyle({color: "darkorange"});
+		} else if (gsb.cards[gsb.cards.length-1][0] == 1) {
+			b.circle.setStyle({color: "maroon"});
+		} else {
+			b.circle.setStyle({color: "navy"});
+		}
+	}
+}
+
+function show_cards_in_hand()
+{
 	for (var i = 0; i < game_state.cards.hands[user-1].length; i++) {
-		/* draw cards to hand */
 		var card = get_card(game_state.cards.hands[user-1][i]);
 
 		var strength_txt = card.strength;
@@ -148,7 +256,14 @@ function show_current_gamestate()
 		document.getElementById("c"+i+"i").textContent = "";
 		document.getElementById("c"+i+"i").appendChild(imgnode);
 		document.getElementById("c"+i+"p").innerText = card.desc;
+		document.getElementById("c"+i+"b").onclick = Function("cardselect(" + i + ");");
+		document.getElementById("c"+i+"b").disabled = false;
 	}
+}
+
+function show_current_turn()
+{
+	document.getElementById("curturn").innerHTML = "Current turn: Player "+game_state.turn;
 }
 
 function game_loop()
@@ -225,19 +340,29 @@ function set_server_addr(addr)
 
 function get_base(id)
 {
-	for (var i = 0; i < bases.length; i++) {
-		if (bases[i].id == id) {
-			return bases[i];
-		}
-	}
-	return null;
+	return internal_id_search(bases, id);
 }
 
 function get_card(id)
 {
-	for (var i = 0; i < cards.length; i++) {
-		if (cards[i].id == id) {
-			return cards[i];
+	return internal_id_search(cards, id);
+}
+
+function get_area(id)
+{
+	return internal_id_search(areas, id);
+}
+
+function get_gs_base(id)
+{
+	return internal_id_search(game_state.board.bases, id);
+}
+
+function internal_id_search(arr, id)
+{
+	for (var i = 0; i < arr.length; i++) {
+		if (arr[i].id == id) {
+			return arr[i];
 		}
 	}
 	return null;
@@ -246,4 +371,231 @@ function get_card(id)
 function set_player(u)
 {
 	user = u;
+}
+
+function clickhandler_base(id)
+{
+console.log(id);
+	var base = get_base(id);
+	var gsbase = get_gs_base(id);
+	var popupcontent = "<p>cards here (top to bottom):</p>";
+	for (var i = 0; i < gsbase.cards.length; i++) {
+		var card = gsbase.cards[i];
+		popupcontent += "<p>(Player " + card[0] + ") " + get_card(card[1]).name + "</p>";
+	}
+
+	L.popup()
+		.setLatLng(base.loc)
+  		.setContent(popupcontent)
+  		.addTo(map)
+  		.openOn(map);
+}
+
+function clickhandler_rightclick_base(id)
+{
+	if (game_state.turn != user) {
+		alert("it is not yet your turn!");
+		return;
+	}
+	if (selected_card == null) {
+		alert("no card selected!");
+		return;
+	}
+	map.closePopup();
+
+	/* cannot place on own base */
+	var base = get_base(id);
+	if (base.base == user) {
+		alert("You cannot place a unit on your own base!");
+		return;
+	}
+
+	/* handle strength comparisons */
+	var gsbase = get_gs_base(id);
+	var played_card = get_card(game_state.cards.hands[user-1][selected_card]);
+	var topcardstr;
+	/* duck card handled below as well */
+	if (played_card.strength == 0 || gsbase.cards.length == 0 || gsbase.cards[gsbase.cards.length-1][0] == user) {
+		topcardstr = -1;
+	} else {
+		topcardstr = get_card(gsbase.cards[gsbase.cards.length-1][1]).strength;
+	}
+	if (played_card.strength <= topcardstr) {
+		alert(
+			"your card is too weak!\n" +
+			"\tYour card's strength: "+played_card.strength + "\n" +
+			"\tEnemy's strength: "+topcardstr
+		);
+		return;
+	}
+
+	/* handle connection to base requirements */
+	var base = get_base(id);
+
+	var connected2base = 0;
+	if (played_card.ability != 4 || base.base != 0) { /* ability 4 can airdrop anywhere except if placing on enemy base*/
+		var connected = [id];
+		var todo = JSON.parse(JSON.stringify(base.neighbours));
+
+		while (todo.length > 0) {
+			/* discard top item if it is in connected */
+			var skip = 0;
+			for (var i = 0; i < connected.length; i++) {
+				if (connected[i] == todo[0]) {
+					skip = 1;
+					break;
+				}
+			}
+			if (skip) {
+				todo.splice(0, 1);
+				continue;
+			}
+
+			/* succeed if base found */
+			if (get_base(todo[0]).base == user) {
+				connected2base = 1;
+				break;
+			}
+
+			/* skip if top item not owned by you */
+			var td0gsbase = get_gs_base(todo[0]);
+			if (td0gsbase.cards.length == 0 || td0gsbase.cards[td0gsbase.cards.length-1][0] != user) {
+				todo.splice(0, 1);
+				continue;
+			}
+
+			/* otherwise this is connected. push to connected and add children */
+			connected.push(todo[0]);
+			var nb = get_base(todo[0]).neighbours;
+			for (var i = 0; i < nb.length; i++) {
+				if (nb[i] != todo[0]) {
+					todo.push(nb[i]);
+				}
+			}
+			todo.splice(0, 1);
+		}
+		if (!connected2base) {
+			alert("You can only play this card to connected bases!");
+			return;
+		}
+	}
+
+	game_state.cards.hands[user-1].splice(selected_card, 1);
+	gsbase.cards.push([user, played_card.id]);
+	selected_card = null;
+
+	/* clear and rewrite the cards in hand */
+	clear_cards_in_hand();
+	show_cards_in_hand();
+
+	switch (played_card.ability) {
+	case 1: /* draw 2 */
+		if (game_state.cards.hands[user-1].length <= 6) {
+			var choice = randint(game_state.cards.decks[user-1].length);
+			game_state.cards.hands[user-1].push(game_state.cards.decks[user-1][choice]);
+			game_state.cards.decks[user-1].splice(choice, 1);
+		}
+		/* fallthrough :3 */
+	case 6: /* draw 1 */
+		if (game_state.cards.hands[user-1].length <= 7) {
+			var choice = randint(game_state.cards.decks[user-1].length);
+			game_state.cards.hands[user-1].push(game_state.cards.decks[user-1][choice]);
+			game_state.cards.decks[user-1].splice(choice, 1);
+		};
+	case 4: /* can be placed anywhere (ability handled already above) */
+	case 0: /* no ability (incl duck) */
+		next_round();
+		return;
+
+	case 2: /* play another turn */
+		return;
+
+	case 3: /* discard surrounding */
+	case 5: /* discard from opponent hand */
+		alert("ability id "+played_card.ability+" not implemented");
+		next_round();
+		return;
+	}
+}
+
+function cardselect(ind)
+{
+	for (var i = 0; i < game_state.cards.hands[user-1].length; i++) {
+		document.getElementById("c"+i+"b").disabled = false;
+	}
+	document.getElementById("c"+ind+"b").disabled = true;
+	selected_card = ind;
+}
+
+function next_round()
+{
+	/* check for capture of areas */
+	var captured = [];
+	for (var i = 0; i < areas.length; i++) {
+		var a = areas[i];
+		var bord = a.border;
+		var base = get_gs_base(bord[0]);
+		if (base.cards.length == 0) {
+			continue;
+		}
+		var owner = base.cards[base.cards.length-1][0];
+		var owned = 1;
+		for (var j = 1; j < bord.length; j++) {
+			var bs = get_gs_base(bord[j]);
+			if (bs.cards.length == 0 || bs.cards[bs.cards.length-1][0] != user) {
+				owned = 0;
+				break;
+			}
+		}
+		if (owned) {
+			captured.push([owner, i]);
+		}
+	}
+	for (var i = captured.length; i >= 0; i--) {
+		var area = areas[captured[i][1]];
+		var owner = captured[i][0];
+		game_state.money[owner] += area.cash;
+		area.polygon.removeFrom(map);
+		areas.splice(captured[i][1], 1);
+	}
+
+	/* check for win */
+	var p1b, p2b;
+	for (var i = 0; i < bases.length; i++) {
+		if (bases[i].base == 1) {
+			p1b = bases[i];
+		}
+		if (bases[i].base == 2) {
+			p2b = bases[i];
+		}
+	}
+	p1b = get_gs_base(p1b.id);
+	p2b = get_gs_base(p2b.id);
+	if (p1b.cards.length != 0) {
+		game_state.win = 2;
+	}
+	if (p2b.cards.length != 0) {
+		game_state.win = 1;
+	}
+	if (game_state.money[0] >= winmoney) {
+		game_state.win = 1;
+	}
+	if (game_state.money[1] >= winmoney) {
+		game_state.win = 2;
+	}
+
+	/* change turns */
+	if (game_state.turn == 1) {
+		game_state.turn = 2;
+	} else {
+		game_state.turn = 1;
+	}
+
+	game_state.turn_number++;
+
+	/* update current gamestate first before we update the server */
+	show_current_gamestate();
+
+	/* update the server */
+	set_server_state();
 }

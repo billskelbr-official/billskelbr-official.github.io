@@ -1,4 +1,5 @@
 {
+	win: int,
 	turn_number: int (turn number, incremented by 1 each turn),
 	turn: int (whose turn it is, either 1 or 2),
 	money: [
@@ -9,8 +10,7 @@
 		bases: [
 			{
 				id: int (base id),
-				owner: int (1 or 2),
-				card: int (cardid)
+				cards: [[int (cardid), int owner], ...]
 			}, ...
 		],
 		areas: [

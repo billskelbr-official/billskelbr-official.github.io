@@ -1,4 +1,11 @@
 {
+	"rules": {
+		"winmoney": 7
+	},
+	"redirects": {
+		"win": "https://www.vice.com/wp-content/uploads/sites/2/2025/04/waypoint-big-rigs.jpg?w=1024",
+		"lose": "https://www.shutterstock.com/image-vector/you-lose-red-stamp-text-260nw-303609539.jpg"
+	},
 	"cards": [
 		{
 			"id": 0,
@@ -33,7 +40,7 @@
 			"strength": 3,
 			"ability": 3,
 			"img": "https://www.nicepng.com/png/full/227-2272150_skin3-minecraft-iron-golem-png.png",
-			"desc": "Discard one adjacent enemy",
+			"desc": "<TODO / NOT IMPLEMENTED> Discard one adjacent enemy",
 			"count": 8
 		},
 		{
@@ -50,8 +57,8 @@
 			"name": "Robot",
 			"strength": 5,
 			"ability": 5,
-			"desc": "Randomly discard one troop from opponent's rack faceup",
 			"img": "https://purepng.com/public/uploads/large/robots-glo.png",
+			"desc": "<TODO / NOT IMPLEMENTED> Randomly discard one troop from opponent's rack faceup",
 			"count": 8
 		},
 		{
