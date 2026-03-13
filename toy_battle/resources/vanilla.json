@@ -40,7 +40,7 @@
 			"strength": 3,
 			"ability": 3,
 			"img": "https://www.nicepng.com/png/full/227-2272150_skin3-minecraft-iron-golem-png.png",
-			"desc": "<TODO / NOT IMPLEMENTED> Discard one adjacent enemy",
+			"desc": "Discard one adjacent enemy",
 			"count": 3
 		},
 		{

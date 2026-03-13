@@ -385,9 +385,9 @@ function clickhandler_base(id)
 {
 	var base = get_base(id);
 	var gsbase = get_gs_base(id);
-	var popupcontent;
+	var popupcontent = "<p>ID: "+id+"</p>";
 	if (base.base == user) {
-		popupcontent = "<p class=\"p1bg\">Player 1 discarded faceup:</p>";
+		popupcontent += "<p class=\"p1bg\">Player 1 discarded faceup:</p>";
 		for (var i = 0; i < game_state.cards.faceup[0].length; i++) {
 			var card = get_card(game_state.cards.faceup[0][i]);
 			popupcontent += "<p class=\"p1bg\">";
@@ -481,7 +481,6 @@ function clickhandler_rightclick_base(id)
 	var base = get_base(id);
 	map.closePopup();
 
-
 	var connected2base = 0;
 	if (played_card.ability != 4 || base.base != 0) { /* ability 4 can airdrop anywhere except if placing on enemy base*/
 		var connected = [id];
@@ -567,7 +566,37 @@ function clickhandler_rightclick_base(id)
 		return;
 
 	case 3: /* discard surrounding */
-		alert("ability id "+played_card.ability+" not implemented");
+		var nb = base.neighbours;
+		var targets = [];
+		var str = "Select a base ID to discard: \n";
+		for (var i = 0; i < nb.length; i++) {
+			var g = get_gs_base(nb[i]);
+			if (g.cards.length > 0 && g.cards[g.cards.length-1][0] != user) {
+				targets.push(g);
+				str += "" + nb[i] + "\n";
+			}
+		}
+		if (targets.length == 0) {
+			alert("cannot activate ability, no neighbours occupied by enemy!");
+		} else {
+			if (targets.length == 1) {
+				var tgt;
+				tgt = targets[0];
+			} else {
+				var ok = 0;
+				do {
+					tgt = prompt();
+					for (var i = 0; i < targets.length; i++) {
+						if (targets[i] == tgt) {
+							ok = 1;
+							break;
+						}
+					}
+				} while (!ok);
+			}
+			var tgt = get_gs_base(tgt);
+			game_state.cards.faceup[(!(user-1))+0].push(tgt.cards.splice(tgt.cards.length-1)[1]);
+		}
 		next_round();
 		return;
 	case 5: /* discard from opponent hand */
