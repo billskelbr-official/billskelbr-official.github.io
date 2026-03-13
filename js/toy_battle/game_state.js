@@ -590,7 +590,7 @@ function next_round()
 	/* check for capture of areas */
 	var captured = [];
 	for (var i = 0; i < game_state.board.areas.length; i++) {
-		var a = get_area(game_state.board.areas[i]);
+		var a = get_area(game_state.board.areas[i].id);
 		var bord = a.border;
 		var gsbase = get_gs_base(bord[0]);
 		var base = get_base(bord[0]);
