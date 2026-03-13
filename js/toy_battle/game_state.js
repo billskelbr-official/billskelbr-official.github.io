@@ -144,6 +144,7 @@ function initialise_gamestate()
 			game_state.cards.decks[1].push(cards[i].id);
 		}
 	}
+alert("todo: ban cards")
 	for (var i = 0; i < 4; i++) {
 		game_state.cards.decks[0].splice(randint(game_state.cards.decks[0].length), 1);
 		game_state.cards.decks[1].splice(randint(game_state.cards.decks[1].length), 1);
@@ -205,11 +206,12 @@ function show_current_gamestate()
 	for (var i = 0; i < game_state.board.areas.length; i++) {
 		var areastate = game_state.board.areas[i];
 
-		if (areastate.cash == 0) {
-			continue;
-		}
 		var area = get_area(areastate.id);
-		area.polygon.bindTooltip("$"+areastate.cash, {permanent: true, direction:"center"});
+		if (areastate.cash == 0) {
+			area.polygon.removeFrom(map);
+		} else {
+			area.polygon.bindTooltip("$"+areastate.cash, {permanent: true, direction:"center"});
+		}
 	}
 
 	/* maps stuff - units on bases */
@@ -389,8 +391,8 @@ console.log(id);
 	for (var i = gsbase.cards.length-1; i >= 0 ; i--) {
 		var gscard = gsbase.cards[i];
 		var card = get_card(gscard[1]);
-		popupcontent += "<p class=\"p"+card[0]+"bg\">";
-		popupcontent += "(Player " + card[0] + ") ";
+		popupcontent += "<p class=\"p"+gscard[0]+"bg\">";
+		popupcontent += "(Player " + gscard[0] + ") ";
 		popupcontent += card.name + " ";
 		popupcontent += "("+card.strength+")</p>";
 	}
@@ -587,7 +589,6 @@ function next_round()
 		var owner = captured[i][0];
 		game_state.money[owner] += area.cash;
 		area.polygon.removeFrom(map);
-		areas.splice(captured[i][1], 1);
 	}
 
 	/* check for win */
