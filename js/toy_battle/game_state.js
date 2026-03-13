@@ -579,8 +579,9 @@ function clickhandler_rightclick_base(id)
 		if (targets.length == 0) {
 			alert("cannot activate ability, no neighbours occupied by enemy!");
 		} else {
+			var tgt;
 			if (targets.length == 1) {
-				var tgt;
+				tgt;
 				tgt = targets[0];
 			} else {
 				var ok = 0;
@@ -594,7 +595,7 @@ function clickhandler_rightclick_base(id)
 					}
 				} while (!ok);
 			}
-			var tgt = get_gs_base(tgt);
+			tgt = get_gs_base(tgt);
 			game_state.cards.faceup[(!(user-1))+0].push(tgt.cards.splice(tgt.cards.length-1)[1]);
 		}
 		next_round();
