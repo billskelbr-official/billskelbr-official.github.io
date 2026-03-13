@@ -184,6 +184,12 @@ function show_current_gamestate()
 	/* current game turn */
 	show_current_turn();
 
+	/* money */
+	document.getElementById("p1_money").innerHTML = game_state.money[0];
+	document.getElementById("p2_money").innerHTML = game_state.money[1];
+
+	/* reset selected card because the buttons are deselected */
+	selected_card = null;
 	/* draw cards to hand */
 	show_cards_in_hand();
 
@@ -207,6 +213,7 @@ function show_current_gamestate()
 	}
 
 	/* maps stuff - units on bases */
+	update_map_colours();
 
 }
 
@@ -379,9 +386,13 @@ console.log(id);
 	var base = get_base(id);
 	var gsbase = get_gs_base(id);
 	var popupcontent = "<p>cards here (top to bottom):</p>";
-	for (var i = 0; i < gsbase.cards.length; i++) {
-		var card = gsbase.cards[i];
-		popupcontent += "<p>(Player " + card[0] + ") " + get_card(card[1]).name + "</p>";
+	for (var i = gsbase.cards.length-1; i >= 0 ; i--) {
+		var gscard = gsbase.cards[i];
+		var card = get_card(gscard[1]);
+		popupcontent += "<p class=\"p"+card[0]+"bg\">";
+		popupcontent += "(Player " + card[0] + ") ";
+		popupcontent += card.name + " ";
+		popupcontent += "("+card.strength+")</p>";
 	}
 
 	L.popup()
@@ -397,6 +408,25 @@ function clickhandler_rightclick_base(id)
 		alert("it is not yet your turn!");
 		return;
 	}
+
+	var base = get_base(id);
+	if (base.base == user) {
+		selected_card = null;
+		/* draw 2 cards */
+		if (game_state.cards.hands[user-1].length <= 6) {
+			var choice = randint(game_state.cards.decks[user-1].length);
+			game_state.cards.hands[user-1].push(game_state.cards.decks[user-1][choice]);
+			game_state.cards.decks[user-1].splice(choice, 1);
+		}
+		if (game_state.cards.hands[user-1].length <= 7) {
+			var choice = randint(game_state.cards.decks[user-1].length);
+			game_state.cards.hands[user-1].push(game_state.cards.decks[user-1][choice]);
+			game_state.cards.decks[user-1].splice(choice, 1);
+		}
+		next_round();
+		return;
+	}
+
 	if (selected_card == null) {
 		alert("no card selected!");
 		return;
@@ -487,6 +517,7 @@ function clickhandler_rightclick_base(id)
 	/* clear and rewrite the cards in hand */
 	clear_cards_in_hand();
 	show_cards_in_hand();
+	update_map_colours();
 
 	switch (played_card.ability) {
 	case 1: /* draw 2 */
