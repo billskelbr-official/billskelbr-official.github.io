@@ -596,7 +596,9 @@ function clickhandler_rightclick_base(id)
 				} while (!ok);
 			}
 			tgt = get_gs_base(tgt);
-			game_state.cards.faceup[(!(user-1))+0].push(tgt.cards.splice(tgt.cards.length-1, 1)[1]);
+			var card = tgt.cards[tgt.cards.length-1][1];
+			game_state.cards.faceup[(!(user-1))+0].push(card);
+			tgt.cards.splice(tgt.cards.length-1, 1);
 		}
 		next_round();
 		return;
