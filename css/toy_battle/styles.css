@@ -45,3 +45,34 @@
 	height: 1vw;
 	width: 12vw;
 }
+
+#gameend, #gameendbtn {
+	display: none;
+}
+
+#gameend.game_end_activate {
+	height: 100vh;
+	width: 100vw;
+	position: fixed;
+	display: block;
+	top: 0;
+	left: 0;
+	z-index: 10000000;
+}
+
+.game_end_activate>img {
+	height: 100%;
+	width:100%;
+	object-fit: fill;
+	z-index: 10000001;
+}
+
+.game_end_activate>#gameendbtn {
+	position: fixed;
+	top: 5vw;
+	left: 5vw;
+	display: block;
+	height: 2vw;
+	width: 5vw;
+	z-index: 10000002;
+}

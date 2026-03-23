@@ -31,5 +31,5 @@ function main()
 		set_server_state();
 		show_current_gamestate();
 	}
-	setInterval(function() {game_loop()}, 7000);
+	gameupdate = setInterval(function() {game_loop()}, 7000);
 }

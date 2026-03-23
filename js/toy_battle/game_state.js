@@ -23,6 +23,7 @@ var user = 0;
 var selected_card = null;
 var links;
 var winmoney;
+var gameupdate;
 
 /* see js/toy_battle/game_state.txt for details on game state */
 var game_state = DEFAULTGAMESTATE;
@@ -166,6 +167,7 @@ function show_current_gamestate()
 	/* win? */
 	if (game_state.win != 0) {
 		var dest;
+		clearInterval(gameupdate);
 		if (game_state.win == user) {
 			dest = links.win;
 		} else {
@@ -177,9 +179,10 @@ function show_current_gamestate()
 			} else {
 				alert("you lose!");
 			}
-			dest = "http://bilskelbr.atwebpages.com/toy_battle";
+		} else {
+			document.getElementById("gameend").classList.add("game_end_activate");
+			document.getElementById("gameendimg").src = dest;
 		}
-		window.location.href = dest;
 	}
 
 	/* current game turn */
@@ -238,15 +241,12 @@ function update_map_colours()
 		var b = bases[i];
 		var gsb = get_gs_base(b.id);
 
-		if (b.base != 0) {
-			continue;
-		}
 		if (b.imgoverlay) {
 			b.imgoverlay.removeFrom(map);
 		}
-		if (gsb.cards.length == 0) {
+		if (b.base == 0 && gsb.cards.length == 0) {
 			b.circle.setStyle({color: "darkorange"});
-		} else  {
+		} else if (gsb.cards.length > 0) {
 			if (gsb.cards[gsb.cards.length-1][0] == 1) {
 				b.circle.setStyle({color: "maroon"});
 			} else {
@@ -257,7 +257,7 @@ function update_map_colours()
 				b.circle.getBounds(),
 				{zIndex: 999}
 			).addTo(map);
-		}
+		} /* no else; otherwise it is a hq without cards, so keep orig colour */
 	}
 }
 
@@ -718,6 +718,11 @@ function next_round()
 	/* update the server */
 	set_server_state();
 
-	/* update current gamestate after we update the server, because this redirects away after a win */
+	/* update current gamestate after we update the server, because this stops future server updates */
 	show_current_gamestate();
+}
+
+function hide_gameend()
+{
+	document.getElementById("gameend").remove();
 }
