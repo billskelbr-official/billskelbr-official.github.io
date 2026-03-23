@@ -51,11 +51,15 @@ function board_init(user, resources_url)
 		]);
 		map.setMinZoom(12);
 		map.setMaxZoom(15);
-/*
-		L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-			attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-		}).addTo(map);
-*/
+
+		if (res.map.tiles) {
+			if (res.map.tiles.type == "osm") {
+				L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+					attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+					referrerPolicy: 'strict-origin'
+				}).addTo(map);
+			}
+		}
 		winmoney = res.rules.winmoney;
 		document.getElementById("moneytitle").innerText = "Money ($" + winmoney + " to win)";
 
@@ -227,6 +231,7 @@ function clear_cards_in_hand()
 	}
 }
 
+/* this function also updates map image overlays */
 function update_map_colours()
 {
 	for (var i = 0; i < bases.length; i++) {
@@ -236,12 +241,22 @@ function update_map_colours()
 		if (b.base != 0) {
 			continue;
 		}
+		if (b.imgoverlay) {
+			b.imgoverlay.removeFrom(map);
+		}
 		if (gsb.cards.length == 0) {
 			b.circle.setStyle({color: "darkorange"});
-		} else if (gsb.cards[gsb.cards.length-1][0] == 1) {
-			b.circle.setStyle({color: "maroon"});
-		} else {
-			b.circle.setStyle({color: "navy"});
+		} else  {
+			if (gsb.cards[gsb.cards.length-1][0] == 1) {
+				b.circle.setStyle({color: "maroon"});
+			} else {
+				b.circle.setStyle({color: "navy"});
+			}
+			b.imgoverlay = L.imageOverlay(
+				get_card(gsb.cards[gsb.cards.length-1][1]).img,
+				b.circle.getBounds(),
+				{zIndex: 999}
+			).addTo(map);
 		}
 	}
 }
@@ -314,6 +329,7 @@ function get_server_state()
 		server_num = resp.body;
 	} catch (e) {
 		alert("could not get game state from server\n" + e);
+		return -1;
 	}
 
 	if (cur_num >= server_num) {
@@ -330,6 +346,7 @@ function get_server_state()
 		game_state = JSON.parse(atob(resp.body));
 	} catch (e) {
 		alert("could not get game state from server\n" + e);
+		return -1;
 	}
 	cur_num = server_num;
 	return 1;
