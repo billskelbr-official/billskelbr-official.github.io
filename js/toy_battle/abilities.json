@@ -1,0 +1,59 @@
+[
+	{
+		"id": 0,
+		"name": "NONE",
+		"desc": "no ability. wildcard also uses this ability, but has strength set to 0."
+	},
+	{
+		"id": 1,
+		"name": "DRAW 2",
+		"desc": "Draw 2 cards from reserve"
+	},
+	{
+		"id": 2,
+		"name": "PLAY ANOTHER",
+		"desc": "Play another card and invoke ability"
+	},
+	{
+		"id": 3,
+		"name": "DISCARD SURROUNDING",
+		"desc": "Discard a chosen enemy directly next to this card face-up"
+	},
+	{
+		"id": 4,
+		"name": "PLACE ANYWHERE",
+		"desc": "Exempt from linked to own HQ requirement"
+	},
+	{
+		"id": 5,
+		"name": "DISCARD FROM ENEMY HAND",
+		"desc": "Discard one random card from enemy's hand face-up"
+	},
+	{
+		"id": 6,
+		"name": "DRAW 1",
+		"desc": "Draw 1 card from reserve"
+	},
+
+
+	{
+		"id": 100,
+		"name": "SURROUNDING ABILITY",
+		"desc": "Invoke ability of one chosen surrounding card (allied or enemy)"
+	},
+	{
+		"id": 101,
+		"name": "UNDISCARD 1",
+		"desc": "Return 1 card at random from own face up discarded pile to reserve"
+	},
+	{
+		"id": 102,
+		"name": "UNDISCARD 2",
+		"desc": "Return 2 cards at random from own face up discarded pile to reserve"
+	},
+	{
+		"id": 103,
+		"name": "CHOICE OF 3",
+		"desc": "Choose one card from one of three opened from reserve pile and add it to hand; other two are mixed back into reserve"
+	}
+]

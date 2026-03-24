@@ -554,82 +554,190 @@ function clickhandler_rightclick_base(id)
 	show_cards_in_hand();
 	update_map_colours();
 
-	switch (played_card.ability) {
-	case 1: /* draw 2 */
-		if (game_state.cards.hands[user-1].length <= 6) {
-			var choice = randint(game_state.cards.decks[user-1].length);
-			game_state.cards.hands[user-1].push(game_state.cards.decks[user-1][choice]);
-			game_state.cards.decks[user-1].splice(choice, 1);
-		}
-		/* fallthrough :3 */
-	case 6: /* draw 1 */
-		if (game_state.cards.hands[user-1].length <= 7) {
-			var choice = randint(game_state.cards.decks[user-1].length);
-			game_state.cards.hands[user-1].push(game_state.cards.decks[user-1][choice]);
-			game_state.cards.decks[user-1].splice(choice, 1);
-		};
-	case 4: /* can be placed anywhere (ability handled already above) */
-	case 0: /* no ability (incl duck) */
-		next_round();
-		return;
-
-	case 2: /* play another turn */
-		if (game_state.cards.hands[user-1].length == 0) {
-			alert("you don't have a card to play again!");
+	var abilityval = played_card.ability;
+	do {
+		switch (abilityval) {
+		case 1: /* draw 2 */
+			if (game_state.cards.hands[user-1].length <= 6) {
+				var choice = randint(game_state.cards.decks[user-1].length);
+				game_state.cards.hands[user-1].push(game_state.cards.decks[user-1][choice]);
+				game_state.cards.decks[user-1].splice(choice, 1);
+			}
+			/* fallthrough :3 */
+		case 6: /* draw 1 */
+			if (game_state.cards.hands[user-1].length <= 7) {
+				var choice = randint(game_state.cards.decks[user-1].length);
+				game_state.cards.hands[user-1].push(game_state.cards.decks[user-1][choice]);
+				game_state.cards.decks[user-1].splice(choice, 1);
+			};
+		case 4: /* can be placed anywhere (ability handled already above) */
+		case 0: /* no ability (incl duck) */
 			next_round();
 			return;
-		}
-		return;
 
-	case 3: /* discard surrounding */
-		var nb = base.neighbours;
-		var targets = [];
-		var str = "Select a base ID to discard: \n";
-		for (var i = 0; i < nb.length; i++) {
-			var g = get_gs_base(nb[i]);
-			if (g.cards.length > 0 && g.cards[g.cards.length-1][0] != user) {
-				targets.push(g.id);
-				str += "" + nb[i] + "\n";
+		case 2: /* play another turn */
+			if (game_state.cards.hands[user-1].length == 0) {
+				alert("you don't have a card to play again!");
+				next_round();
+				return;
 			}
-		}
-		if (targets.length == 0) {
-			alert("cannot activate ability, no neighbours occupied by enemy!");
-		} else {
-			var tgt;
-			if (targets.length == 1) {
-				tgt;
-				tgt = targets[0];
+			return;
+
+		case 3: /* discard surrounding */
+			var nb = base.neighbours;
+			var targets = [];
+			var str = "Select a base ID to discard: \n";
+			for (var i = 0; i < nb.length; i++) {
+				var g = get_gs_base(nb[i]);
+				if (g.cards.length > 0 && g.cards[g.cards.length-1][0] != user) {
+					targets.push(g.id);
+					str += "" + nb[i] + "\n";
+				}
+			}
+			if (targets.length == 0) {
+				alert("cannot activate ability, no neighbours occupied by enemy!");
 			} else {
-				var ok = 0;
+				var tgt;
+				if (targets.length == 1) {
+					tgt;
+					tgt = targets[0];
+				} else {
+					var ok = 0;
+					do {
+						tgt = prompt(str);
+						for (var i = 0; i < targets.length; i++) {
+							if (targets[i] == tgt) {
+								ok = 1;
+								break;
+							}
+						}
+					} while (!ok);
+				}
+				tgt = get_gs_base(tgt);
+				var card = tgt.cards[tgt.cards.length-1][1];
+				game_state.cards.faceup[(!(user-1))+0].push(card);
+				tgt.cards.splice(tgt.cards.length-1, 1);
+			}
+			next_round();
+			return;
+		case 5: /* discard from opponent hand */
+			var enemy = 1+!(user-1);
+			if (game_state.cards.hands[enemy-1].length == 0) {
+				alert("Enemy has no cards to discard!");
+			} else {
+				var discard_ind = randint(game_state.cards.hands[enemy-1].length);
+				game_state.cards.faceup[enemy-1].push(game_state.cards.hands[enemy-1][discard_ind]);
+				game_state.cards.hands[enemy-1].splice(discard_ind, 1);
+			}
+			next_round();
+			return;
+
+		case 100: /* invoke ability of one surrounding card */
+			var nb = base.neighbours;
+			var targets = [];
+			var str = "Select a base ID's ability to invoke: \n";
+			for (var i = 0; i < nb.length; i++) {
+				var g = get_gs_base(nb[i]);
+				if (g.cards.length > 0) {
+					targets.push(g.id);
+					str += "" + nb[i] + "\n";
+				}
+			}
+			if (targets.length == 0) {
+				alert("cannot activate ability, no occupied neighbours!");
+			} else {
+				var tgt;
+				if (targets.length == 1) {
+					tgt;
+					tgt = targets[0];
+				} else {
+					var ok = 0;
+					do {
+						tgt = prompt(str);
+						for (var i = 0; i < targets.length; i++) {
+							if (targets[i] == tgt) {
+								ok = 1;
+								break;
+							}
+						}
+					} while (!ok);
+				}
+				tgt = get_gs_base(tgt);
+				var card = get_card(tgt.cards[tgt.cards.length-1][1]);
+				abilityval = card.ability;
+				break; /* break the switch, loop again to handle new stolen ability */
+			}
+			next_round();
+			return;
+		case 102: /* undiscard 2 */
+			if (game_state.cards.faceup[user-1].length > 0) {
+				var ind = randint(game_state.cards.faceup[user-1].length);
+				game_state.cards.decks[user-1].push(game_state.cards.faceup[user-1][ind]);
+				game_state.cards.faceup[user-1].splice(ind, 1);
+			}
+			/* fallthrough! */
+		case 101: /* undiscard 1 */
+			if (game_state.cards.faceup[user-1].length > 0) {
+				var ind = randint(game_state.cards.faceup[user-1].length);
+				game_state.cards.decks[user-1].push(game_state.cards.faceup[user-1][ind]);
+				game_state.cards.faceup[user-1].splice(ind, 1);
+			}
+			next_round();
+			return;
+		case 103: /* open 3 reserve choose 1 */
+			var num_choices = 3;
+			var choices = [];
+			var promptstr = "Your choices: \n";
+
+			if (game_state.cards.hands[user-1].length == 8) {
+				alert("Your hand is full; cannot draw cards");
+				next_round();
+				return;
+			}
+
+			if (game_state.cards.decks[user-1].length < 3) {
+				num_choices = game_state.cards.decks[user-1].length;
+			}
+			if (num_choices == 0) {
+				/* wtf? */
+				alert("ERROR: out of cards");
+				return;
+			}
+			for (var i = 0; i < num_choices; i++) {
+				var ind = randint(game_state.cards.decks[user-1].length);
+				choices.push(game_state.cards.decks[user-1][ind]);
+				game_state.cards.decks[user-1].splice(ind, 1);
+				promptstr += (""+choices[i] + " (" + get_card(choices[i]).name + ")\n");
+			}
+			var choice = null;
+			if (num_choices == 1) {
+				choice = choices[0];
+			} else {
 				do {
-					tgt = prompt(str);
-					for (var i = 0; i < targets.length; i++) {
-						if (targets[i] == tgt) {
-							ok = 1;
+					choice = prompt(promptstr);
+					var ok = false;
+					for (var i = 0; i < choices.length; i++) {
+						if (choices[i] == choice) {
+							ok = true;
 							break;
 						}
 					}
 				} while (!ok);
 			}
-			tgt = get_gs_base(tgt);
-			var card = tgt.cards[tgt.cards.length-1][1];
-			game_state.cards.faceup[(!(user-1))+0].push(card);
-			tgt.cards.splice(tgt.cards.length-1, 1);
+			var ind;
+			game_state.cards.hands[user-1].push(choice);
+			for (var i = 0; i < num_choices; i++) {
+				if (choices[i] == choice) {
+					/* ignore this one, but change choice to dummy val so that other occurences are counter properly */
+					choice = null;
+					continue;
+				}
+				game_state.cards.decks[user-1].push(choices[i]);
+			}
+			next_round();
+			return;
 		}
-		next_round();
-		return;
-	case 5: /* discard from opponent hand */
-		var enemy = 1+!(user-1);
-		if (game_state.cards.hands[enemy-1].length == 0) {
-			alert("Enemy has no cards to discard!");
-		} else {
-			var discard_ind = randint(game_state.cards.hands[enemy-1].length);
-			game_state.cards.faceup[enemy-1].push(game_state.cards.hands[enemy-1][discard_ind]);
-			game_state.cards.hands[enemy-1].splice(discard_ind, 1);
-		}
-		next_round();
-		return;
-	}
+	} while (true);
 }
 
 function cardselect(ind)
