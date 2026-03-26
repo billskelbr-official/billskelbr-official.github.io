@@ -611,7 +611,7 @@ function clickhandler_rightclick_base(id)
 				var g = get_gs_base(nb[i]);
 				if (g.cards.length > 0 && g.cards[g.cards.length-1][0] != user) {
 					targets.push(g.id);
-					str += "" + nb[i] + "\n";
+					str += "" + nb[i] + "(" + get_card(g.cards[g.cards.length-1][1]).name + ")\n";
 				}
 			}
 			if (targets.length == 0) {
@@ -660,7 +660,7 @@ function clickhandler_rightclick_base(id)
 				var g = get_gs_base(nb[i]);
 				if (g.cards.length > 0) {
 					targets.push(g.id);
-					str += "" + nb[i] + "\n";
+					str += "" + nb[i] + "(" + get_card(g.cards[g.cards.length-1][1]).name + ")\n";
 				}
 			}
 			if (targets.length == 0) {
