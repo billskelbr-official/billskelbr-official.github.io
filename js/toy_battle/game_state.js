@@ -24,6 +24,7 @@ var selected_card = null;
 var links;
 var winmoney;
 var gameupdate;
+var lastupdate = Date.now();
 
 /* see js/toy_battle/game_state.txt for details on game state */
 var game_state = DEFAULTGAMESTATE;
@@ -286,8 +287,24 @@ function show_cards_in_hand()
 function game_loop()
 {
 	/* pause checking when it's our turn */
-	if (game_state.turn != user && get_server_state() == 1) {
+	if (game_state.turn == user) {
+		return;
+	}
+	if (lastupdate < Date.now() - 20000) {
+		alert("gamestate over 20 secs out of date");
+		window.location.reload();
+		return;
+	}
+	switch (get_server_state()) {
+	case -1: /* error; get_server_state should've displayed an alert */
+		window.location.href = "/toy_battle";
+		break;
+	case 1: /* have update */
 		show_current_gamestate();
+		/* fallthrough */
+	case 0: /* checked and found no new update */
+		lastupdate = Date.now();
+		document.getElementById("updateinfo").innerText = "Last updated: "+lastupdate;
 	}
 }
 
@@ -296,9 +313,11 @@ function clear_server_state()
 	internal_write_server_state("");
 }
 
+/* gamestate was last 'updated' when we updated the server */
 function set_server_state()
 {
 	internal_write_server_state(btoa(JSON.stringify(game_state)));
+	lastupdate = Date.now();
 }
 
 function internal_write_server_state(payload)
@@ -751,6 +770,9 @@ function cardselect(ind)
 
 function next_round()
 {
+	/* prevent race condition where lastupdate is checked after turn is set but before set_server_state called */
+	lastupdate = Date.now();
+
 	/* check for capture of areas */
 	var captured = [];
 	for (var i = 0; i < game_state.board.areas.length; i++) {

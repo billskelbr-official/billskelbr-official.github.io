@@ -76,3 +76,11 @@
 	width: 5vw;
 	z-index: 10000002;
 }
+
+#updateinfo {
+	position: fixed;
+	top: 15vh;
+	left: 2vw;
+	z-index: 1000000000;
+	background-color: white;
+}

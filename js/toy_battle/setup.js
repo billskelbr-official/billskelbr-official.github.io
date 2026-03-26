@@ -5,7 +5,8 @@ function startgame()
 		resource = document.getElementById("customresource").value;
 	}
 	var server = document.getElementById("serverinput").value;
-	var player = document.querySelector("input[name=\"player\"]:checked").value
+	var player = document.querySelector("input[name=\"player\"]:checked").value;
+	var startgame = document.querySelector("input[name=\"startgame\"]:checked").value;
 
 	if (!confirm(
 		"confirm settings: \n" +
@@ -14,7 +15,9 @@ function startgame()
 		"\tServer address:\n" +
 		"\t\t" + server + "\n" +
 		"\tPlaying as:\n" +
-		"\t\tPlayer " + player
+		"\t\tPlayer " + player +
+		"\tJoin game:\n" +
+		"\t\t" + startgame == 0 ? "Current game" : "New game"
 	)) {
 		return;
 	}
@@ -22,7 +25,9 @@ function startgame()
 	var gamesettings = {
 		resource: resource,
 		server: server,
-		player: player
+		player: player,
+		startgame: startgame
 	};
+
 	window.location.href = "/toy_battle?settings="+btoa(JSON.stringify(gamesettings));
 }

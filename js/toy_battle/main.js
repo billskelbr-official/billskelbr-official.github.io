@@ -25,11 +25,12 @@ function main()
 	set_player(user);
 
 	board_init(user, resources_url);
-	if (user == 1 && !confirm("Click cancel to start a new game\nClick OK to join the current game")) {
+	if (settings.startgame == 1) {
 		initialise_gamestate();
 		clear_server_state();
 		set_server_state();
 		show_current_gamestate();
 	}
-	gameupdate = setInterval(function() {game_loop()}, 7000);
+	game_loop();
+	gameupdate = setInterval(function() {game_loop()}, 5000);
 }
