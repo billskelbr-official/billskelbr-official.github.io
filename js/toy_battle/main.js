@@ -29,9 +29,10 @@ function main()
 		initialise_gamestate();
 		clear_server_state();
 		set_server_state();
-		/* rejoin in join current game mode to allow user to refresh game page withotu wiping current game */
+		/* rejoin in join current game mode to allow user to refresh game page without wiping current game */
+		/* have to rejoin through setup.html because this page checks referrer */
 		settings.startgame = 0;
-		window.location.href = "/toy_battle?settings="+btoa(JSON.stringify(settings));
+		window.location.href = "setup.html?settings="+btoa(JSON.stringify(settings));
 	}
 	game_loop();
 	gameupdate = setInterval(function() {game_loop()}, 5000);

@@ -8,6 +8,12 @@ function startgame()
 	var player = document.querySelector("input[name=\"player\"]:checked").value;
 	var startgame = document.querySelector("input[name=\"startgame\"]:checked").value;
 
+	/* forward settings if present to allow start game pages to rejoin in current game mode */
+	var urlsettings = (new URL(window.location)).searchParams.get("settings");
+	if (urlsettings != null) {
+		window.location.href = "/toy_battle?settings="+urlsettings;
+	}
+
 	if (!confirm(
 		"confirm settings: \n" +
 		"\tResource file:\n" +
