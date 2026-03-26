@@ -15,7 +15,7 @@ function startgame()
 		"\tServer address:\n" +
 		"\t\t" + server + "\n" +
 		"\tPlaying as:\n" +
-		"\t\tPlayer " + player +
+		"\t\tPlayer " + player + "\n" +
 		"\tJoin game:\n" +
 		"\t\t" + (startgame == 0 ? "Current game" : "New game")
 	)) {
