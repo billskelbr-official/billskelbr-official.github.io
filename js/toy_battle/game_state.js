@@ -318,6 +318,7 @@ function set_server_state()
 {
 	internal_write_server_state(btoa(JSON.stringify(game_state)));
 	lastupdate = Date.now();
+	document.getElementById("updateinfo").innerText = "Last updated: "+lastupdate;
 }
 
 function internal_write_server_state(payload)
@@ -772,7 +773,7 @@ function next_round()
 {
 	/* prevent race condition where lastupdate is checked after turn is set but before set_server_state called */
 	lastupdate = Date.now();
-
+	document.getElementById("updateinfo").innerText = "Last updated: "+lastupdate;
 	/* check for capture of areas */
 	var captured = [];
 	for (var i = 0; i < game_state.board.areas.length; i++) {
