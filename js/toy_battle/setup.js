@@ -1,3 +1,14 @@
+window.onload = setup_onload;
+
+function setup_onload()
+{
+	/* forward settings if present to allow start game pages to rejoin in current game mode */
+	var urlsettings = (new URL(window.location)).searchParams.get("settings");
+	if (urlsettings != null) {
+		window.location.href = "/toy_battle?settings="+urlsettings;
+	}
+}
+
 function startgame()
 {
 	var resource = document.querySelector("input[name=\"resource\"]:checked").value;
@@ -7,12 +18,6 @@ function startgame()
 	var server = document.getElementById("serverinput").value;
 	var player = document.querySelector("input[name=\"player\"]:checked").value;
 	var startgame = document.querySelector("input[name=\"startgame\"]:checked").value;
-
-	/* forward settings if present to allow start game pages to rejoin in current game mode */
-	var urlsettings = (new URL(window.location)).searchParams.get("settings");
-	if (urlsettings != null) {
-		window.location.href = "/toy_battle?settings="+urlsettings;
-	}
 
 	if (!confirm(
 		"confirm settings: \n" +
