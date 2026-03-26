@@ -17,7 +17,7 @@ function startgame()
 		"\tPlaying as:\n" +
 		"\t\tPlayer " + player +
 		"\tJoin game:\n" +
-		"\t\t" + startgame == 0 ? "Current game" : "New game"
+		"\t\t" + (startgame == 0 ? "Current game" : "New game")
 	)) {
 		return;
 	}
