@@ -29,7 +29,9 @@ function main()
 		initialise_gamestate();
 		clear_server_state();
 		set_server_state();
-		show_current_gamestate();
+		/* rejoin in join current game mode to allow user to refresh game page withotu wiping current game */
+		settings.startgame = 0;
+		window.location.href = "/toy_battle?settings="+btoa(JSON.stringify(settings));
 	}
 	game_loop();
 	gameupdate = setInterval(function() {game_loop()}, 5000);
