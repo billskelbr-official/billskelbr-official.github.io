@@ -346,7 +346,7 @@ function get_server_state()
 			alert(resp.body);
 			return -1;
 		}
-		server_num = resp.body;
+		server_num = parseInt(resp.body);
 	} catch (e) {
 		alert("could not get game state from server\n" + e);
 		return -1;
